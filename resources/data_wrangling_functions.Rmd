@@ -1,6 +1,6 @@
 ---
 title: "Important functions for data wrangling"
-author: "Template: Ian Hussey; Content: [student name]"
+author: "Template: Ian Hussey; Content: André Minder"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
@@ -72,37 +72,38 @@ vs. `read.csv()`
 
 When using relative paths: "../" means up one directory level, whereas "directory_name/" goes down one directory level.
 
-Relative paths will work on other machines, where absolute paths will break. 
-
-Relative paths only work in .Rmd files and not .R files. Even without RMarkdown's other benefits, this makes them worth using.
+Relative paths will work on other machines, where absolute paths will break. Note that relative paths only work in .Rmd files and not .R files. Even without RMarkdown's other benefits, this makes them worth using.
 
 Useful arguments:
 
-- `skip` can be used to skip the first N rows while reading the data
+- 'skip' can be used to skip the first n rows when reading in a file
 
 ```{r}
 
-
-
-# readr::read_csv()
+# load the data (with a relative path), skipping the first 2 rows
+data <- readr::read_csv("../../data/AMP study/raw/data_demographics_raw_messy.csv", skip = 2)
 
 ```
 
 ## dir.create
 
+The function 'dir.create' creates a new folder/directory at a specified location. This is useful if we need to establish a folder structure for someone else on a different computer. We even can produce whole folder structure from scratch. This ultimately contributes to the codes and projects reproducibility. 
+
 ```{r}
 
-# dir.create()
+dir.create("../../code/analysis/results") # creates a folder called 'results' in the analysis folder
 
 ```
 
 ## colnames & dput
 
+The function 'colnames' is an easy way to get the names/headers of columns from a df. 
+
 ```{r}
 
-# colnames()
+column_headers <- colnames(mtcars) # saves column headers in a new variable
 
-# dput(colnames())
+# put(colnames(mtcars))
 
 ```
 
@@ -110,122 +111,268 @@ Useful arguments:
 
 ## the pipe: `%>%` or `|>`
 
+The pipe can be used for channeling the output of a function into another function. This supports code readability (because it is easily comprehensible how functions are nested) and helps avoiding errors.
+
+There is an old version of the pipe ( %>% ) and a new one ( |> ). The old pipe was part of the magrittr/dplyr package, while the new pipe is part of base R. This makes it possible to use the pipe without loading any packages. Note that the new version of the pipe is not compatible with all functions.
+
 ```{r}
 
-# %>%
+mtcars_new_v1 <- colnames(rename(slice(mtcars, 2:n()), ghp = hp)) # this version of code is hard to read
 
-# |>
+mtcars_new_v2 <- mtcars |>      # this version of code is much easier to read (and to write!). Note that both  
+  slice(2:n()) |>               # version arrive at the same result.
+  rename(ghp = hp) |> 
+  colnames()
 
 ```
 
 ## round_half_up
 
+The function 'round_half_up' from the 'janitor' rounds numbers in a more intuitive way than the base R function 'round'. The function 'round' performs the so-called bankers rounding, which rounds up or down not only depending on the numbers after the decimal point, but also depending on the number before the decimal point. In contrast, 'round_half_up' rounds numbers 'normally' (up if => .5, down if < .5).
+
 ```{r}
 
-# janitor::round_half_up()
+vector <- c(0.5, 1.5, 2.5, 3.5, 4.5)
+
+# Bankers rounding in action
+round(vector)
+
+# More intuitive rounding
+round_half_up(vector)
 
 ```
 
 ## clean_names
 
+The function 'clean_names' from the 'janitor' package cleans up unhandy variable names (e.g. variable names with special characters) and renames them appropriately. This is helpful for large data sets with many variables, because other functions like 'rename' ask you to specify each target variable and its new name.
+
 ```{r}
 
-# janitor::clean_names()
+
+mtcars_bad_headers <- mtcars |>     # This code generates a data set with inconvenient headers. Note that
+  rename(`! mpg` = mpg,             # if we would rename the headers back to their original name, we would 
+         `.cyl` = cyl,              # need quite some lines of code
+         `Gear` = gear)
+
+mtcars_good_headers <- janitor::clean_names(mtcars_bad_headers) # Column headers are fixed with one line of code!
 
 ```
 
 ## filter
 
+The function 'filter' from the 'dplyr' package selects rows according to some specified condition (e.g. if the rows have a value higher than x in a variable, or a certain character value). Conditions can be constructed with logical operators (e.g. <, <=, !=). Also, several conditions can be linked within one filter function (e.g. &, |)
+
+Useful helper functions:
+
+- '%in%' helps selecting a vector of values from a column (e.g. several categories)
+
 ```{r}
 
-# dplyr::filter()
+# only select rows of the iris species 'setosa'
+iris_setosa <- iris |>                              
+  filter(Species == "setosa")
+
+# only select rows with flowers that have a sepal widsmallerthan 2.5 and belong to the species 'setosa' (linked conditions) 
+iris_setosa_small_sw <- iris |>                     
+  filter(Sepal.Width < 2.5 & Species == "setosa")   
+
+# Select the species 'setosa' and 'versicolor' from the data set
+iris_setosa_versicolor <- iris |> 
+  filter(Species %in% c("setosa", "versicolor"))    
 
 ```
 
 ## slice
 
-Slice is for retaining or dropping rows from a df.
-
-We might use it just after reading in files if there are junk rows at the header.
+The function 'slice' is retaining or dropping rows from a df. It might be used just after reading in files if there are junk header rows.
 
 ```{r}
 
-# dplyr::slice()
-
-mtcars # this should have 32 rows
-slice(mtcars, 2:n()) # this should have 31 rows
+mtcars_new <- mtcars |>     # Select the data from row 2 to the last row
+  slice(2:n())
 
 ```
 
 ## select
 
+The function 'select' from the 'dplyr' package makes it possible to select columns from a df. Note that several selection features can be combined with the symbols & and |. There are also several helper functions that help select the needed columns.
+
+Useful helper functions:
+
+- 'everything()' selects all columns - this might be helpful when columns need to be reordered (see below)
+- 'starts_with()' selects the columns starting with certain characters (not case-sensitive)
+- 'ends_with()' selects the columns ending with certain characters
+- 'contains()' selects the columns that contain certain characters
+
 ```{r}
 
-# dplyr::select()
+# Select the first 5 columns but also omit the column for the variable 'cyl'
+mtcars_small <- mtcars |>   
+  select(1:5 & !cyl)
+
+# Only select the columns that start with 'petal' and the species column
+iris_petal <- iris |> 
+  select(starts_with("petal"), Species)   
+
+ # only select the columns that end with 'width' and the species column
+iris_width <- iris |> 
+  select(ends_with("width"), Species)    
+
+# Rearrange the iris data set by first selecting the column 'Species' and then all the other columns
+iris_rearranged <- iris |>          
+  select(Species, everything())
 
 ```
 
 ## rename
 
+The function 'rename' from the 'dplyr' package can be used to rename column headers. Note that using the function in combination with larger data sets might be an arduous process, since every target variable needs to be listed separately. It is better to use the function 'clean_names' in this case.
+
 ```{r}
 
-# dplyr::rename()
+# Rename the headers of the iris data set to facilitate subsequent coding and avoid time-consuming mistakes (e.g. getting rid of capital letters)
+iris_renamed <- iris |>                   
+  rename(sepal_length = Sepal.Length,     
+         sepal_width = Sepal.Width,
+         petal_length = Petal.Length,
+         petal_width = Petal.Width,
+         species = Species)
 
 ```
 
 ## mutate
 
+The function 'mutate' from the 'dplyr' package makes it possible to create new variables within a df. This is helpful if we want to combine variables (e.g. to calculate a difference score) or if variables are needed in a different unit.
+
+Useful arguments:
+
+- '.after' inserts the manipulated columns after a specified column (and not at the right side of the df)
+- '.before' inserts the manipulated columns before a specified column (and not at the right side of the df)
+- '.unused' drops the columns used for creating the new columns
+
 ```{r}
 
-# dplyr::mutate()
+# create a new variable 'kg' (kilogram) in the df based on the variable 'wt' (weight) which contains values with the unit lbs
+mtcars_kg <- mtcars |>        
+  mutate(kg = wt * 453.592)
+
+# Create two new variables in the iris data set that describe the ratio between petal/sepal width/length.
+# Note the argument .after at the end, which inserts the columns after the column 'Petal.Width'.
+iris_sepal_petal_ratio <- iris |> 
+  mutate(sepal_petal_ratio_width = Sepal.Width / Petal.Width,            
+         sepal_petal_ratio_length = Sepal.Length / Petal.Length,         
+         .after = Petal.Width)
 
 ```
 
 ## case_when
 
+The function 'case_when' from the 'dplyr' can be used to modify data according to several specified conditions. This is of great use, if we need to homogenize inputted data (e.g. gender) so we can summarize it more easily.
 ```{r}
 
-# dplyr::case_when() # instead of ifelse()
+# Making the iris data set a bit messy with case_when
+iris_messy <- iris |> 
+  mutate(Species = case_when(Species == "setosa" ~ toupper("setosa"),
+                             Species == "versicolor" ~ "VerSicolor",
+                             Species == "virginica" ~ Species))
+
+# Unmessy it with case_when
+iris_cleaned <- iris_messy |> 
+  mutate(Species = case_when(Species == "virginica" ~ Species,
+                             Species == "SETOSA" ~ tolower("SETOSA"),
+                             Species == "VerSicolor" ~ "versicolor"))
+  
 
 ```
 
 ## summarize
 
+The function 'summarize' from the 'dpylr' package can be used to aggregate values and calculate summarize statistics.
+
+Useful arguments:
+
+- '.by' can be used to get the summary statistics according to some groups or categories (similar to function 'group_by')
 ```{r}
 
-# dplyr::summarize() 
+# Calculate the median, mean, sd, max and min of Sepal.Length
+iris_stats <- iris |> 
+  summarise(
+    n = n(),
+    iris_median = quantile(Sepal.Length, .5, na.rm = TRUE),
+    iris_mean = mean(Sepal.Length, na.rm = TRUE),
+    iris_sd = sd(Sepal.Length, na.rm = TRUE),
+    iris_max = max(Sepal.Length, na.rm = TRUE),
+    iris_min = max(Sepal.Length, na.rm = TRUE),
+    .by = "Species"
+  )
+
 
 ```
 
 ## count
 
+The function 'count' from the 'dplyr' package counts how many times a category (e.g. iris setosa) appears within a variable (e.g. species). This helps to quickly summarize a data set and is very useful if we need to check if a variable has messy/faulty inputs (e.g. 'woman' instead of 'female' in a gender variable). Conceptually, 'count' does the same as grouping a data set according to a variable and then using summarize to get the n of the respective category. 
+
 ```{r}
 
-# dplyr::count()
+# First variant using group_by and summarize to counts how many times 
+# each species appears in the variable 'species'
+iris_groups_v1 <- iris |> 
+  group_by(Species) |> 
+  summarize(n = n())
+
+#  Simpler variant with count
+iris_groups_v2 <- iris |>  
+  count(Species)
 
 ```
 
 ## distinct
 
+The function 'distinct' from the 'dplyr' package excludes rows that are exact duplicates of each other. It thus helps finding and getting rid of duplicates. In general, it is important to check the number of certain important values (e.g. participants) before and after the wrangling, so one can make sure that nothing relevant was lost during the process.
+
 ```{r}
 
-# dplyr::distinct()
+# duplicating the whole data set
+iris_duplicates <- iris |> 
+  bind_rows(iris)
+
+
+# Getting rid of the duplicates (and one additional row that had the same values as another row in the original data set -> Pay attention when using this function!)
+iris_cleaned <- iris_duplicates |>   
+  distinct()
 
 ```
 
 ## group_by
 
+The function 'group_by' from the 'dplyr' package groups a data set according to a specified variable. This is helpful if we want to summarize or visualize data in relation to some groups or categories. We can also use the argument '.by' within the 'summarize' function to achieve the same.
+
 ```{r}
 
-# dplyr::group_by() # or ".by =" 
+# Getting the n of each iris species
+iris_species_v1 <- iris |> 
+  group_by(Species) |> 
+  summarize(n = n())
+
+# The same as above, but with the argument .by
+iris_species_v2 <- iris |> 
+  summarize(n = n(),
+            .by = Species)
 
 ```
 
 ## rowwise
 
+'Rowwise' is a function from the 'dpylr' package. 'Rowwise' makes it possible to use operations (like taking the mean) across several rows.
+
 ```{r}
 
-# dplyr::rowwise()
+iris_row_means <- iris |> 
+  select(Sepal.Length, Petal.Length) |> 
+  rowwise() |> 
+  mutate(length_row_means = mean(c(Sepal.Length, Petal.Length)))
+  
 
 ```
 
@@ -247,35 +394,77 @@ slice(mtcars, 2:n()) # this should have 31 rows
 
 ## joins
 
+The join functions from the 'dplyr' package are useful for merging data sets. They have a clear advantage over functions like 'cbind', because they combine dfs in a reproducible and easy way, making sure information is related properly across variables. There are several different join functions:
+
+- full_join: Saves all information of both data sets in one data set
+- left_join: Keeps all the data from the left df, while not keeping the unmatched data of the right data frame
+- right_join: Keeps all the data from the right df, while not keeping the unmatched data of the left data frame
+- inner_join: Keeps only the matched data between both dfs (i.e. the intersect data)
+- semi_join: Keeps all the data from the left df, while excluding all the data from the right df plus the intersect data of the two dfs
+
+Useful arguments:
+
+- 'by' specifies which variables/keys are matched across dfs. 'By' = x is a short form of 'join_by(x == x), meaning that we assume that the key variable is equal in both dfs.
+
 ```{r}
 
-# dplyr::full_join()
+# iris data set with different values
+iris_new <- iris |> 
+  mutate(Sepal.Length_t2 = Sepal.Length * 0.5,
+         Sepal.Width_t2 = Sepal.Width * 0.4) |> 
+  slice(1:100)
+  
+# Save the complete information of both dfs in one df
+all_data <- full_join(iris, iris_new)
 
-# dplyr::left_join()
+# Keep all the data from the iris data set and only keep the matched data from the iris_new data set
+left_data <- left_join(iris, iris_new, by = c("Species", "Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"))
 
-# dplyr::right_join()
+# Keep all the data from the iris_new data set and only keep the matched data from the iris data set
+right_data <- right_join(iris, iris_new, by = c("Species", "Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"))
 
-# dplyr::inner_join()
+# Only keep the matched data of both dfs (intersect)
+inner_data <- inner_join(iris, iris_new, by = c("Species", "Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"))
 
-# dplyr::semi_join()
+# Only keep the data of the left df, excluding all data from the right df and the intersection of the left and right df
+semi_data <- semi_join(iris, iris_new, by = c("Species", "Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"))
 
 ```
 
 ## pivots
 
+The pivot functions from the 'tidyr' package help changing the dimension or format of a data set. 'Pivot_longer' can transform a data set into a longer data set (meaning a data set with less columns and more rows), while 'pivot_wider' makes a data set wider (meaning a data set with more columns and less rows). This is of help if we need to have the data set in a specific format (e.g. for visualization with ggplot).
+
 ```{r}
 
-# tidyr::pivot_wider()
+iris_longer <- iris |> 
+  pivot_longer(cols = !Species,
+               names_to = c("flower_part", "dimension"),
+               names_sep = "\\.",
+               values_to = "values"
+               )
 
-# tidyr::pivot_longer()
+iris_wider <- iris_longer |> 
+  pivot_wider(
+    names_from = c("flower_part", "dimension"),
+    values_from = "values"
+    )
 
 ```
 
 ## drop_na
 
+The function 'drop_na' ('tidyr' package) drops rows which contain NA values.
+
 ```{r}
 
-# tidyr::drop_na()
+# Generate a data set with NA values
+iris_na <- iris |> 
+  mutate(Sepal.Length = replace(Sepal.Length, Sepal.Length == 5, NA))
+
+# Drop rows with NA values
+iris_noNa <- iris_na |> 
+  drop_na()
 
 ```
 
@@ -295,13 +484,24 @@ slice(mtcars, 2:n()) # this should have 31 rows
 
 ```
 
+## lapply
+
+'lapply' is a base R function that applies a function to a set of variables. This is very handy if we need to know the types of all variables in our data sets quickly.
+```{r}
+
+lapply(iris, class)
+
+```
+
 # Printing tables
+
+The functions 'kable' (package 'knitr') and 'kable_classic' (package 'kableExtra') can be used to generate and print nice-looking tables.
 
 ```{r}
 
-# mtcars |> # example data
-#   knitr::kable() |> # print a nicer looking table
-#   kableExtra::kable_classic(full_width = FALSE) # print nicer again
+mtcars |> # example data
+  kable() |> # print a nicer looking table
+  kable_classic(full_width = FALSE) # print nicer again
 
 ```
 
@@ -312,6 +512,12 @@ Other packages you may need for wrangling which aren't covered here:
 - library(forcats). Everything to do with factors and factor levels. Useful for plotting and establishing reference levels for statistical tests.
 - library(stringr). Everything to do with strings, searching for strings, modifying strings, parsing them, etc.
 - library(lubridate). Everything to do with dates, parsing dates, converting date formats, etc. 
+
+
+# Helpful GitHub basics
+
+## gitignore
+Gitingore is a feature of GitHub. It "hides" selected files in a sense that they are not visible in the commits or pushed to the repository. This allows us to work locally on a data set, while preventing sensible information from spreading online. It makes sense to filter out sensible information before the first commit (and ignoring the data set with the sensible information), because the commits are also visible online. Also, there is the danger of abandoning made changes and reverting back to a version, where the data set still contains the sensible information.
 
 # Session info
 
