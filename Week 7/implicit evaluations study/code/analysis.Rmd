@@ -1,7 +1,7 @@
 ---
 title: "Evaluations of positive and negative stimuli using the Affective Misattribution Procedure (AMP) and self-reports"
 subtitle: "Analysis"
-author: "Template: Ian Hussey; content: [Student name]"
+author: "Template: Ian Hussey; content: André Minder"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
@@ -40,7 +40,7 @@ Load the processed data and apply the global exclusions.
 
 ```{r}
 
-data_processed <- read_csv("../../../data/AMP study/processed/data_processed.csv")
+data_processed <- read_csv("../data/processed/data_processed.csv")
 
 data_processed_after_exclusions <- data_processed |>
   filter(exclude_participant == "include")
