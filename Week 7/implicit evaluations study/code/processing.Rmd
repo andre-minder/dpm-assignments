@@ -74,14 +74,15 @@ dat_age_gender <- data_demographics_raw |>
 # Exclusions / data quality
 
 ## AMP
+Assignment question: How do we know the right number of trials?
+
+A first thing to inspect is the number of trials for each subject. If we skim through the list quickly, we see  
+that most participants went through 82 trials, consisting of 10 practice trials (5 negative, 5 positive) and 72 
+test trials (36 positive and 36 negative primes). We can then use this df to test hypotheses about the "normal" 
+number of trials.
 
 ```{r}
-# Assignment question: How do we know the right number of trials?
 
-# A first thing to inspect is the number of trials for each subject. If we skim through the list quickly, we see  
-# that most participants went through 82 trials, consisting of 10 practice trials (5 negative, 5 positive) and 72 
-# test trials (36 positive and 36 negative primes). We can then use this df to test hypotheses about the "normal" 
-# number of trials.
 
 data_amp_trials <- data_amp_raw |> 
   group_by(subject) |> 
@@ -91,8 +92,11 @@ data_amp_trials <- data_amp_raw |>
   mutate(all_practice_trials = prime_negative_practice + prime_positive_practice,
          all_test_trials = prime_negative + prime_positive)
 
-# We can get a good first impression of the trial numbers through visualization (however, this will not show us the # NA values). Both graphs imply that the mode of the distribution might be an appropriate measure of the regular  
-# number of trials. These visualizations also suggest that there are a couple of participants who deviate from this # regular number.
+```
+We can get a good first impression of the trial numbers through visualization (however, this will not show us the  NA values). Both graphs imply that the mode of the distribution might be an appropriate measure of the regular  
+number of trials. These visualizations also suggest that there are a couple of participants who deviate from this  regular number.
+
+```{r}
 
 # Histogram for all test trials
 data_amp_trials |> 
@@ -106,31 +110,50 @@ data_amp_trials |>
   geom_histogram() +
   theme_classic()
 
-# We can then use the filter function to get some details about these deviations. Looking at these might help us 
-# finding out, why they deviate.
+```
 
-# Check who deviates from the regular test trial number
+We can then use the filter function to get some details about these deviations. Looking at these might help us 
+finding out, why they deviate.
+
+Check who deviates from the regular test trial number
+```{r}
 data_amp_trials |> 
   filter(all_test_trials != 72 | is.na(all_test_trials))
 
-# Check who deviates from the regular practice trial number
+```
+
+Check who deviates from the regular practice trial number
+```{r}
+
 data_amp_trials |> 
   filter(all_practice_trials != 10 | is.na(all_practice_trials))
 
-# Check who deviates from the regular condition pattern in the test trials
+```
+
+Check who deviates from the regular condition pattern in the test trials
+```{r}
+
 data_amp_trials |> 
   filter(prime_negative != prime_positive)
 
-# Check who deviates from the regular condition pattern in the practice trials
+```
+
+Check who deviates from the regular condition pattern in the practice trials
+```{r}
+
 data_amp_trials |> 
   filter(prime_negative_practice != prime_positive_practice)
 
-# We can then use the gathered information to decide on what the number of "normal" trials is. One simple approach # would be to exclude everyone who deviates from the regular pattern. This might be a justifiable solution 
-# in our case, since the deviations are quite large and explainable (e.g. quitting the experiment in the beginning # or going through it twice). However, depending on our study design and our analyses, this might not be the 
-# right course of action. For example, excluding missing cases might distort the analyses (e.g. in large 
-# longitudinal designs, in which we often fail to measure everyone and everything) and lower the power of 
-# the analysis. In these cases, it might be more appropriate to not exclude these cases, but rather use methods 
-# that deal with these problems (e.g. multiple imputation or HLM).
+```
+
+We can then use the gathered information to decide on what the number of "normal" trials is. One simple approach  would be to exclude everyone who deviates from the regular pattern. This might be a justifiable solution 
+in our case, since the deviations are quite large and explainable (e.g. quitting the experiment in the beginning  or going through it twice). However, depending on our study design and our analyses, this might not be the 
+right course of action. For example, excluding missing cases might distort the analyses (e.g. in large 
+longitudinal designs, in which we often fail to measure everyone and everything) and lower the power of 
+the analysis. In these cases, it might be more appropriate to not exclude these cases, but rather use methods 
+that deal with these problems (e.g. multiple imputation or HLM).
+
+```{r}
 
 # Implementing the criteria and generating a df with an exclusion category
 data_amp_trials_exclusions <- data_amp_trials |> 
@@ -142,6 +165,12 @@ data_amp_trials_exclusions <- data_amp_trials |>
                                          TRUE ~ "include")) |> 
   select(subject, all_practice_trials, all_test_trials, AMP_trials_exclusion)
 
+```
+
+
+AMP Performance
+
+```{r}
 
 # Extracting the necessary information with the number of trials.
 data_amp_performance_criteria <- data_amp_raw |> 
@@ -152,9 +181,14 @@ data_amp_performance_criteria <- data_amp_raw |>
   summarize(proportion_fast_trials_amp = mean(latency_prob)) |>
   mutate(exclude_amp_performance = ifelse(proportion_fast_trials_amp > 0.10, "exclude", "include"))
 
-# Join both dfs
+```
+
+Join both dfs
+```{r}
+
 data_amp_trials_performance_exclusions <- 
   full_join(data_amp_trials_exclusions, data_amp_performance_criteria, by = "subject")
+
 
 ```
 
