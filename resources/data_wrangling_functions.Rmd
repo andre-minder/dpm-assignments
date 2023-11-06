@@ -81,7 +81,7 @@ Useful arguments:
 ```{r}
 
 # load the data (with a relative path), skipping the first 2 rows
-data <- readr::read_csv("../../data/AMP study/raw/data_demographics_raw_messy.csv", skip = 2)
+# data <- readr::read_csv("../../data/AMP study/raw/data_demographics_raw_messy.csv", skip = 2)
 
 ```
 
@@ -91,7 +91,7 @@ The function 'dir.create' creates a new folder/directory at a specified location
 
 ```{r}
 
-dir.create("../../code/analysis/results") # creates a folder called 'results' in the analysis folder
+dir.create("results") # creates a folder called 'results' 
 
 ```
 
@@ -378,17 +378,35 @@ iris_row_means <- iris |>
 
 ## lead
 
-```{r}
+The function 'lead' from the 'dplyr' package introduces NA values at the end of a vector or column of a df.
 
-# dplyr::lead()
+Useful arguments:
+
+- n: Number of NA values to be introduced
+```{r, results='hide'}
+
+# Introducing two NA value at the end of the vector. Importantly, the first two values disappear!
+lead(1:10, n = 2) 
+
+# Introducing NA values to the column 'species' in the iris data set
+iris_NAs <- iris |>  
+  mutate(Species = lag(Species, n = 3)) |> 
+  arrange(Species)
 
 ```
 
 ## lag
 
-```{r}
 
-# dplyr::lag()
+The function 'lag' from the 'dplyr' package introduces NA values at the start of a vector or column of a df.
+
+Useful arguments:
+
+- n: Number of NA values to be introduced
+```{r, results='hide'}
+
+# Introducing four NA values at the beginning of the vector
+lag(1:10, n = 4)
 
 ```
 
@@ -400,7 +418,7 @@ The join functions from the 'dplyr' package are useful for merging data sets. Th
 - left_join: Keeps all the data from the left df, while not keeping the unmatched data of the right data frame
 - right_join: Keeps all the data from the right df, while not keeping the unmatched data of the left data frame
 - inner_join: Keeps only the matched data between both dfs (i.e. the intersect data)
-- semi_join: Keeps all the data from the left df, while excluding all the data from the right df plus the intersect data of the two dfs
+- semi_join: Keeps all the data from the left df, while excluding all the data from the right df plus the intersect data of the two dfs (this might be handy if we join data with an exclusion df)
 
 Useful arguments:
 
