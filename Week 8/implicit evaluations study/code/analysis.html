@@ -2204,7 +2204,7 @@ Nonbinary
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>            <span class="at">SD =</span> <span class="fu">sd</span>(AMP_score, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">group =</span> <span class="st">&quot;Full sample&quot;</span>)</span>
 <span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co"># self-reported evaluations by gender category</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co"># AMP score by gender category</span></span>
 <span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>dat_AMP_score_by_gender <span class="ot">&lt;-</span> data_processed_after_exclusions <span class="sc">|&gt;</span></span>
 <span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  <span class="fu">group_by</span>(<span class="at">group =</span> gender) <span class="sc">|&gt;</span></span>
 <span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Mean =</span> <span class="fu">mean</span>(AMP_score, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>

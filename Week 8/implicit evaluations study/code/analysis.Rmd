@@ -162,7 +162,7 @@ dat_AMP_score <- data_processed_after_exclusions |>
             SD = sd(AMP_score, na.rm = TRUE)) |>
   mutate(group = "Full sample")
 
-# self-reported evaluations by gender category
+# AMP score by gender category
 dat_AMP_score_by_gender <- data_processed_after_exclusions |>
   group_by(group = gender) |>
   summarise(Mean = mean(AMP_score, na.rm = TRUE),
