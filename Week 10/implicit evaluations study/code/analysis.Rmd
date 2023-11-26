@@ -484,7 +484,7 @@ result_nonpar
 
 
 ```
-**Results:** A Wilcoxon rank sum test (or Mann-Whitney U test) with continuity correction was performed to compare mean self-reported evaluations between men and women. Two-sided testing revealed a significant result (W = 622.5, p = 0.003), thus indicating that the two groups differ in their central tendency. More specifically, women's explicit self-reported evaluations were lower on average than men's.
+**Results:** A Wilcoxon rank sum test (or Mann-Whitney U test) with continuity correction was performed to compare mean self-reported evaluations between men and women. Two-sided testing revealed a significant result (W = 622.5, p = 0.003), thus indicating that the two groups differ in their central tendency. More specifically, women's explicit self-reported evaluations were significantly lower on average than men's.
 
 ## Evaluations on the Affect Misattribution Procedure differ between men and women
 
