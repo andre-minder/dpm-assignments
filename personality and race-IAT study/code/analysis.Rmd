@@ -304,23 +304,10 @@ point_plot <- ggplot(data_processed_after_exclusions,
   xlab("Mean self-reported evaluation") +
   theme_classic() 
 
-point_plot_2 <- ggplot(data_processed_after_exclusions, 
-       aes(y = AMP_score,
-           x = mean_evaluation)) +
-  geom_point(color = viridis_pal(begin = 0.45, option = "mako")(1),
-              alpha = 0.5) +
-  geom_smooth(method = "lm",
-              color = viridis_pal(begin = 0.45, option = "mako")(1)) +
-  ylab("AMP score") +
-  xlab("Mean self-reported evaluation") +
-  scale_x_continuous(limits = c(3.2,5)) +
-  theme_classic() 
-
 jitter_plot + point_plot + 
   plot_annotation(title = "Scatter plots of AMP and self-reported evaluations with switched axes",
                   caption = "Note: It does not matter which version we use for the correlation. Also                             note, that one plot is jittered.")
 
-point_plot + point_plot_2
 ```
 
 More complex plots:

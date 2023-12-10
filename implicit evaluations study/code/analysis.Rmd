@@ -40,6 +40,7 @@ library(wesanderson)
 library(easystats)
 library(ggthemes)
 library(patchwork)
+library(papaja)
 
 ```
 
@@ -318,7 +319,7 @@ point_plot_2 <- ggplot(data_processed_after_exclusions,
 
 jitter_plot + point_plot + 
   plot_annotation(title = "Scatter plots of AMP and self-reported evaluations with switched axes",
-                  caption = "Note: It does not matter which version we use for the correlation. Also                             note, that one plot is jittered.")
+                  caption = "Note: It does not matter which version we use for the correlation. Also note, that one plot is jittered.")
 
 point_plot + point_plot_2
 ```
@@ -404,14 +405,16 @@ point_plot + geom_magnify(from = from, to = to) +
 
 ```{r}
 # Perform correlation analysis and report the result
-data_processed_after_exclusions |> 
+results_cor <- data_processed_after_exclusions |> 
   with(cor.test(mean_evaluation, AMP_score,
                 alternative = "two.sided",
                 method = "spearman",
                 exact = FALSE))
 
+results_cor
+
 ```
-**Result:** Spearman's rank correlation was used to assess the relationship between mean self-reported evaluation and AMP score. This two-sided test was not significant (r(88) = -.13, p = 0.231). The results thus indicate a negative, but non-significant relationship between the two variables.
+**Result:** Spearman's rank correlation was used to assess the relationship between mean self-reported evaluation and AMP score. This two-sided test was not significant (`r apa_print(results_cor)$full_result`). The results thus indicate a negative, but non-significant relationship between the two variables.
 
 \TODO 
 
@@ -490,14 +493,12 @@ sr_gender_raincloud <- ggplot(male_female_subset, aes(x = gender, y = mean_evalu
 
 ```{r}
 
-result_nonpar <- wilcox.test(mean_evaluation ~ gender, data = male_female_subset, 
-                             alternative = "two.sided", exact = FALSE)
-result_nonpar
-
-
+results_mean_evaluation_gender <- wilcox.test(mean_evaluation ~ gender, data = male_female_subset, 
+                                              alternative = "two.sided", exact = FALSE)
+results_mean_evaluation_gender
 
 ```
-**Results:** A Wilcoxon rank sum test (or Mann-Whitney U test) with continuity correction was performed to compare mean self-reported evaluations between men and women. Two-sided testing revealed a significant result (W = 622.5, p = 0.003), thus indicating that the two groups differ in their central tendency. More specifically, women's explicit self-reported evaluations were significantly lower on average than men's.
+**Results:** A Wilcoxon rank sum test (or Mann-Whitney U test) with continuity correction was performed to compare mean self-reported evaluations between men and women. Two-sided testing revealed a significant result (`r apa_print(results_mean_evaluation_gender)$full_result`), thus indicating that the two groups differ in their central tendency. More specifically, women's explicit self-reported evaluations were significantly lower on average than men's.
 
 ## Evaluations on the Affect Misattribution Procedure differ between men and women
 
