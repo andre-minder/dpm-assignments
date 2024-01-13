@@ -1,6 +1,6 @@
 ---
-title: "Plot assignment"
-author: "Template: Ian Hussey; content: [Student name]"
+title: "Plot Assignment"
+author: "Template: Ian Hussey; content: André Minder"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
@@ -75,10 +75,10 @@ data <- sim_design(within = list(condition = c(cat = "Cat Condition", stone = "S
 ```{r}
 
 # in case this dir doesn't exist, create it
-dir.create("../data/")
+dir.create("data/")
 
 # save data to disk in that dir
-write_csv(data, "../data/data.csv")
+write_csv(data, "data/data.csv")
 
 ```
 
@@ -213,8 +213,6 @@ ggsave("plot_bad_André_Minder.png",
        height = 8,
        dpi = 300, 
        path = "plots")
-
-
 
 ```
 
