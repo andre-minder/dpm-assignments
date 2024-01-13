@@ -1,7 +1,7 @@
 ---
-title: "Evaluations of positive and negative stimuli using the Affective Misattribution Procedure (AMP) and self-reports"
+title: "Examining the Relationship Between the Big-5 Personality Facets and Implicit Racial Attitudes"
 subtitle: "Data processing"
-author: "Template: Ian Hussey; content: André Minder"
+author: "André Minder"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
@@ -23,25 +23,25 @@ knitr::opts_chunk$set(message = FALSE,
 
 ```{r}
 
-library(tidyverse)
-library(janitor) # for clean_names()
-library(psych)
+library(tidyverse)        # for general data wrangling/tidying
+library(janitor)          # for general data wrangling/tidying
+library(openxlsx)         # for writing excel files (codebook)
 
 ```
 
-# Load the data
+# Load the Data
 
 ```{r}
 
-# read in BFI data
+# read in BFI data and immediately clean names
 data_bfi <- read_csv("../data/raw/data_raw_bfi.csv") |>
   janitor::clean_names()
 
-# read in IAT data
+# read in IAT data and immediately clean names
 data_iat <- read_csv("../data/raw/data_raw_iat.csv") |>
   janitor::clean_names()
 
-# read in IAT data
+# read in IAT data and immediately clean names
 data_demographics <- read_csv("../data/raw/data_raw_demographics.csv") |>
   janitor::clean_names()
 
@@ -49,297 +49,327 @@ data_demographics <- read_csv("../data/raw/data_raw_demographics.csv") |>
 
 # Demographics
 
-Extract age and gender from the demographics raw file
+Extract age and gender from the demographics raw file. All rows containing data from participants with a missing unique ID are removed (since they cannot be assigned to the other data, i.e. BFI and IAT, anyway). Missing values in the age and sex variable are substituted with "missing/error/others".
+
 ```{r}
 
 data_demographics_clean <- data_demographics |>
-  mutate(response = case_when(is.na(response) ~ "missing/error/others",
-                              TRUE ~ response)) |> 
-  mutate(unique_id = ifelse(is.na(unique_id), "missing", unique_id)) |> 
-  pivot_wider(names_from = "variable", values_from = "response")
-
-data_demographics_clean |> 
-  count(unique_id) |> 
-  filter(n > 1)
-  
-         
-         
-  mutate(unique_id = ifelse(is.na(unique_id), "missing", unique_id)) |> 
- 
-  
-data_demographics |> 
-  count(response)
-  
-  select(subject, date, time, trialcode, response) |>
-  pivot_wider(names_from = trialcode,
-              values_from = response) |>
-  mutate(gender = tolower(gender),
-         gender = stringr::str_remove_all(gender, regex("\\W+")), # regex is both very useful and awful to write
-         gender = case_when(gender == "female" ~ gender,
-                            gender == "male" ~ gender,
-                            gender == "nonbinary" ~ gender,
-                            gender == "woman" ~ "female",
-                            gender == "man" ~ "male",
-                            TRUE ~ "other/missing/error"),
-         age = case_when(str_detect(age, "^[0-9]+$") ~ age, # if the value is only numbers, keep it. 
-                         TRUE ~ "other/missing/error")) 
+  drop_na(unique_id) |> 
+  pivot_wider(names_from = "variable", values_from = "response") |> 
+  mutate(age = ifelse(is.na(age), "missing/error/others", age), 
+         sex = ifelse(is.na(sex), "missing/error/others", sex),
+         sex = recode(sex, "f" = "female", "m" = "male"),
+         unique_id = as.character(unique_id))
 
 ```
 
-# Big Five
+
+# BFI
+
+## Recoding
+
+In this section, the following is achieved:
+
+- Reverse negatively worded items
+- Check the successfulness of the recoding by calculating the correlation between each item on each separate subscale
+
+Note that item bfi_o7 and bfi_o10 negatively correlate after recoding. This might not be due to false reversal or implementation, but due to artefacts in the data. Regardless of the reason, the negative correlation is very small.
 
 ```{r}
-# List of the negatively worded items
+
+# Construct a vector of all negatively worded items
 negatively_worded <- c("bfi_a1", "bfi_a3", "bfi_a6", "bfi_a8", 
                        "bfi_c2", "bfi_c4", "bfi_c5", "bfi_c9",
                        "bfi_e2", "bfi_e5", "bfi_e7", 
                        "bfi_n2", "bfi_n5", "bfi_n7", 
                        "bfi_o7", "bfi_o9")
 
-# Reverse negatively worded items
+# Reverse negatively worded items with the vector constructed above
 data_bfi_recoded <- data_bfi |>
   mutate(
-    across((negatively_worded), 
+    across(all_of(negatively_worded), 
            ~ recode(.x, `1` = 6, `2` = 5, `3` = 4,
                     `4` = 3, `5` = 2, `6` = 1))
     )
 
-# Sanity check I (check recoding):
+# Sanity check for the recoding (check correlation between items). First construct a correlation matrix and then check if all coefficients are positive.
+
+## Agreeableness
 data_bfi_recoded |> 
   select(starts_with("bfi_a")) |> 
-  cov(use = "pairwise.complete.obs")
+  cor(use = "pairwise.complete.obs") |> 
+  as.data.frame() |> 
+  summarize(across(where(is.numeric), ~ all(. > 0))) |> 
+  all()
 
+## Conscientiousness
 data_bfi_recoded |> 
   select(starts_with("bfi_c")) |> 
-  cov(use = "pairwise.complete.obs")
+  cor(use = "pairwise.complete.obs") |> 
+  as.data.frame() |> 
+  summarize(across(where(is.numeric), ~ all(. > 0))) |> 
+  all()
 
+## Extroversion
 data_bfi_recoded |> 
   select(starts_with("bfi_e")) |> 
-  cov(use = "pairwise.complete.obs")
+  cor(use = "pairwise.complete.obs") |> 
+  as.data.frame() |> 
+  summarize(across(where(is.numeric), ~ all(. > 0))) |> 
+  all()
 
+## Neuroticism
 data_bfi_recoded |> 
   select(starts_with("bfi_n")) |> 
-  cov(use = "pairwise.complete.obs")
+  cor(use = "pairwise.complete.obs") |>
+  as.data.frame() |> 
+  summarize(across(where(is.numeric), ~ all(. > 0))) |> 
+  all()
 
+## Openness
 data_bfi_recoded |> 
   select(starts_with("bfi_o")) |> 
-  cov(use = "pairwise.complete.obs")
+  cor(use = "pairwise.complete.obs") |>
+  as.data.frame() |> 
+  summarize(across(where(is.numeric), ~ all(. > 0))) |> 
+  all()
 
-# Sanity check II (impossible values):
+```
+
+
+## Impossible Values
+
+In this section, participants with impossible values (i.e. values below 1 and above 6) are marked as excluded. This will make it possible to exclude such participants from the analysis later on.
+
+```{r}
+
+# Check if there are impossible values. Participants with impossible values are first marked as "FALSE" and then as "excluded".
 data_bfi_exclude_impossible_values <- data_bfi_recoded |>
-  mutate(exclude_impossible_values = if_all(-unique_id,
+  mutate(exclude_impossible_values = if_all(-unique_id, 
     ~case_when(.x < 1 ~ FALSE,
                .x > 6 ~ FALSE,
                TRUE ~ TRUE))) |> 
+  mutate(across(where(is.logical), as.character)) |> 
   mutate(exclude_impossible_values = recode(exclude_impossible_values, 
-                                            `FALSE` = "exclude", `TRUE` = "include"))
-
+                                           "FALSE" = "exclude", "TRUE" = "include"))
 
 ```
 
 
+## Complete Subscales and Subscale Means
 
+In this section, the following is achieved:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Exclusions / data quality
-
-## AMP
+- Check if all subscales, which have been completed by the participants, do not contain any missing values
+- Calculate the mean of the completed subscales for each participant
+- Check if the calculated mean lay between 1 and 6
 
 ```{r}
 
-data_amp_performance_criteria <- data_amp_raw |> 
-  filter(blockcode != "practice", 
-         trialcode != "instructions") |> 
-  mutate(latency_prob = if_else(latency < 100, TRUE, FALSE)) |> 
-  group_by(subject) |> 
-  summarize(proportion_fast_trials_amp = mean(latency_prob)) |>
-  mutate(exclude_amp_performance = ifelse(proportion_fast_trials_amp > 0.10, "exclude", "include"))
+# Check for complete agreeableness subscale and calculate its mean
+data_bfi_exclude_a <- data_bfi_exclude_impossible_values |> 
+  select(unique_id:bfi_a9, exclude_impossible_values) |> 
+  rowwise() |> 
+  mutate(n_na_a = sum(is.na(c_across(bfi_a1:bfi_a9)))) |> 
+  mutate(exclusion_incomplete_scale_a = case_when(n_na_a < 1 ~ "include",
+                                                  n_na_a > 8 ~ "include",
+                                                  TRUE ~ "exclude"),
+         bfi_mean_a = mean(c_across(bfi_a1:bfi_a9), na.rm = TRUE)) |> 
+  mutate(mean_a = ifelse(is.nan(bfi_mean_a), NA, bfi_mean_a)) |> 
+  select(-n_na_a)
+    
+# Check for complete conscientiousness subscale and calculate its mean
+data_bfi_exclude_c <- data_bfi_exclude_impossible_values |> 
+  select(unique_id, bfi_c1:bfi_c9) |> 
+  rowwise() |> 
+  mutate(n_na_c = sum(is.na(c_across(bfi_c1:bfi_c9)))) |> 
+  mutate(exclusion_incomplete_scale_c = case_when(n_na_c < 1 ~ "include",
+                                                  n_na_c > 8 ~ "include",
+                                                  TRUE ~ "exclude"),
+         bfi_mean_c = mean(c_across(bfi_c1:bfi_c9), na.rm = TRUE)) |> 
+  mutate(bfi_mean_c = ifelse(is.nan(bfi_mean_c), NA, bfi_mean_c)) |> 
+  select(-n_na_c)
 
-# determine modal number of trials
-data_amp_completeness <- data_amp_raw |>
-  filter(blockcode != "practice",
-         trialcode != "instructions") |>
-  group_by(subject) |>
-  count() |>
-  ungroup() |>
-  mutate(exclude_amp_completeness = ifelse(n == 72, "include", "exclude")) |>
-  select(-n)
+# Check for complete extroversion subscale and calculate its mean
+data_bfi_exclude_e <- data_bfi_exclude_impossible_values |> 
+  select(unique_id, bfi_e1:bfi_e8) |> 
+  rowwise() |> 
+  mutate(n_na_e = sum(is.na(c_across(bfi_e1:bfi_e8)))) |> 
+  mutate(exclusion_incomplete_scale_e = case_when(n_na_e < 1 ~ "include",
+                                                  n_na_e > 7 ~ "include",
+                                                  TRUE ~ "exclude"),
+         bfi_mean_e = mean(c_across(bfi_e1:bfi_e8), na.rm = TRUE)) |> 
+  mutate(bfi_mean_e = ifelse(is.nan(bfi_mean_e), NA, bfi_mean_e)) |> 
+  select(-n_na_e)
 
-# data_amp_completeness |>
-#   count(n)
+# Check for complete neuroticism subscale and calculate its mean
+data_bfi_exclude_n <- data_bfi_exclude_impossible_values |> 
+  select(unique_id, bfi_n1:bfi_n8) |> 
+  rowwise() |> 
+  mutate(n_na_n = sum(is.na(c_across(bfi_n1:bfi_n8)))) |> 
+  mutate(exclusion_incomplete_scale_n = case_when(n_na_n < 1 ~ "include",
+                                                  n_na_n > 7 ~ "include",
+                                                  TRUE ~ "exclude"),
+         bfi_mean_n = mean(c_across(bfi_n1:bfi_n8), na.rm = TRUE)) |> 
+  mutate(bfi_mean_n = ifelse(is.nan(bfi_mean_n), NA, bfi_mean_n)) |> 
+  select(-n_na_n)
 
-```
+# Check for complete openness subscale and calculate its mean
+data_bfi_exclude_o <- data_bfi_exclude_impossible_values |> 
+  select(unique_id, bfi_o1, bfi_o2:bfi_o9, bfi_o10) |> 
+  rowwise() |> 
+  mutate(n_na_o = sum(is.na(c_across(bfi_o1:bfi_o10)))) |> 
+  mutate(exclusion_incomplete_scale_o = case_when(n_na_o < 1 ~ "include",
+                                                  n_na_o > 9 ~ "include",
+                                                  TRUE ~ "exclude"),
+         bfi_mean_o = mean(c_across(bfi_o1:bfi_o10), na.rm = TRUE)) |> 
+  mutate(bfi_mean_o = ifelse(is.nan(bfi_mean_o), NA, bfi_mean_o)) |> 
+  select(-n_na_o)
 
-- One participant with 8 trials appears to be a partial completion (check raw data?)
-- One participant with 144 trials appears to be a repeat participant. I've chosen to exclude them entirely, but you could also have a more elaborate strategy where you retain only their first completion.
+# Merge all the BFI exclusions/subscale mean tables into one
+data_bfi_scored <- full_join(data_bfi_exclude_a, data_bfi_exclude_c, by = "unique_id") |> 
+  full_join(data_bfi_exclude_e, by = "unique_id") |> 
+  full_join(data_bfi_exclude_n, by = "unique_id") |> 
+  full_join(data_bfi_exclude_o, by = "unique_id") |> 
+  mutate(unique_id = as.character(unique_id)) |> 
+  select(-exclude_impossible_values, everything())
 
-# Self-reports
-
-```{r}
-
-# trial level data
-data_selfreport_trial_level <- data_selfreport_raw |>
-  select(subject, trialcode, response) |>
-  filter(trialcode %in% c("like", "prefer", "positive")) |>
-  rename(item = trialcode) |>
-  filter(response != "Ctrl+'B'") |>
-  mutate(response = as.numeric(response))
-
-# mean scored
-data_selfreport_mean_score <- data_selfreport_trial_level |>
-  group_by(subject) |>
-  summarize(mean_evaluation = mean(response, na.rm = TRUE))
-
-# combined
-data_selfreport_scored <- 
-  full_join(data_selfreport_trial_level |>
-              pivot_wider(names_from = "item",
-                          values_from = "response"),
-            data_selfreport_mean_score,
-            by = "subject")
-
-```
-
-# Affect Misattribution Procedure
-
-TODO extract evaluations on the AMP test blocks and convert to an overall bias score
-
-```{r}
-
-data_amp_score_congruence <- data_amp_raw |> 
-  select(subject, evaluative_response = correct, trialcode, blockcode) |> 
-  filter(blockcode != "practice", 
-         trialcode != "instructions") |> 
-  mutate(trialcode = case_when(trialcode == "prime_positive" ~ 1, 
-                               trialcode == "prime_negative" ~ 0,
-                               TRUE ~ NA),
-         prime_congruence = ifelse(trialcode == evaluative_response, 1, 0)) 
-
-# sanity check 1: if you consider all the combiantions of factor levels of trialcode, evaluative_response, and prime congruence, there should be only 4:
-data_amp_score_congruence |>
-  count(trialcode, evaluative_response, prime_congruence)
-
-data_amp_score_congruence |>
-  count(trialcode, evaluative_response, prime_congruence) |>
-  nrow() == 4
-
-# calculate AMP score 
-data_amp_score <- data_amp_score_congruence |> 
-  group_by(subject) |> 
-  summarize(AMP_score = mean(prime_congruence, na.rm = TRUE)) |> 
-  select(subject, AMP_score)
-
-# sanity check 2: check if AMP_score is numeric 
-is.numeric(data_amp_score$AMP_score)
-
-# sanity check 3: check if AMP_score is bounded [0,1]
-data_amp_score |> 
-  mutate(bounded_correctly = between(AMP_score, left = 0, right = 1)) |>
+# Sanity check for all BFI subscales (check if means are between 1 and 6)
+data_bfi_scored |> 
+  mutate(bounded_correctly = case_when(between(bfi_mean_a, left = 1, right = 6) ~ TRUE,
+                                       between(bfi_mean_c, left = 1, right = 6) ~ TRUE,
+                                       between(bfi_mean_e, left = 1, right = 6) ~ TRUE,
+                                       between(bfi_mean_n, left = 1, right = 6) ~ TRUE,
+                                       between(bfi_mean_o, left = 1, right = 6) ~ TRUE,
+                                       TRUE ~ FALSE)) |> 
   filter(bounded_correctly != TRUE) |>
   nrow() == 0
 
 ```
 
-# Combine
+# IAT
 
-```{r}
+## Cleaning
 
-# combine all dfs created in the previous chunks
-data_processed_temp <- dat_age_gender |>
-  full_join(data_selfreport_scored, by = "subject") |> 
-  full_join(data_amp_score, by = "subject") |> 
-  full_join(data_amp_performance_criteria, by = "subject") |>
-  full_join(data_amp_completeness, by = "subject")
+```{r IAT}
 
-# flag all subjects with more than one row in the wide-format data. these should be excluded in the analysis.
-# a more elaborate approach would be to track down the individual dupicate cases and determine which of the mulitiple cases should be retained. 
-data_processed_duplicates <- data_processed_temp |>
-  count(subject) |>
-  mutate(exclude_duplicate_data = if_else(n > 1, "exclude", "include")) |>
-  select(-n)
-
-# join in the duplicates df
-data_processed_before_exclusions <- data_processed_temp |>
-  full_join(data_processed_duplicates, by = "subject")
+# Some data wrangling/tidying for the IAT data (change header names, clean/rename header names, select relevant columns and rows)
+data_iat_clean <- data_iat |> 
+  janitor::row_to_names(row_number = 1) |> 
+  janitor::clean_names() |> 
+  rename(trial_rt = trial_reaction_time_in_ms) |> 
+  select(unique_id, block_number, trial_accuracy, trial_rt) |>
+  mutate(trial_rt = as.numeric(trial_rt)) |> 
+  filter(!block_number %in% c(1,2,5))
 
 ```
 
-# Define master exclusions
+## D-score
 
 ```{r}
 
-# create a master exclude_participant variable
-data_processed <- data_processed_before_exclusions |>
-  mutate(exclude_participant = case_when(tolower(age) == "test" ~ "exclude",
-                                         tolower(gender) == "test" ~ "exclude",
-                                         is.na(mean_evaluation) ~ "exclude",
-                                         # in this case we will exclude participants with missing demographics data or outcomes measures data. 
-                                         # Note that "list-wise exclusions" like this aren't always justified, as missingness often isn't at random. 
-                                         # How to treat missing data is a  whole area of work in itself, which we wont cover here.
-                                         is.na(age) ~ "exclude", 
-                                         is.na(gender) ~ "exclude",
-                                         exclude_amp_performance == "exclude" ~ "exclude",
-                                         exclude_duplicate_data == "exclude" ~ "exclude",
-                                         exclude_amp_completeness == "exclude" ~ "exclude", 
+# Calculate mean1 (mean of block 3 and 6)
+data_iat_mean1 <- data_iat_clean |> 
+  filter(block_number %in% c(3, 6)) |> 
+  group_by(unique_id) |> 
+  summarize(mean1 = mean(trial_rt, na.rm = TRUE))
+
+# Calculate mean2 (mean of block 4 and 7)
+data_iat_mean2 <- data_iat_clean |> 
+  filter(block_number %in% c(4, 7)) |> 
+  group_by(unique_id) |> 
+  summarize(mean2 = mean(trial_rt, na.rm = TRUE))
+    
+# Calculate SD (SD of block 3, 4, 6, 7)
+data_iat_SD <- data_iat_clean |> 
+  filter(block_number %in% c(3, 4, 6 ,7)) |> 
+  group_by(unique_id) |> 
+  summarize(SD = sd(trial_rt, na.rm = TRUE))
+
+# Merge all the statistics to calculate the d score (mean2 - mean1 / SD)
+data_iat_scored <- full_join(data_iat_mean1, data_iat_mean2, by = "unique_id") |> 
+  full_join(data_iat_SD, by = "unique_id") |> 
+  group_by(unique_id) |> 
+  summarize(d_score = (mean2 - mean1)/SD)
+
+# Sanity check (scores are bounded between -2 and +2)
+data_iat_scored |> 
+  mutate(bounded_correctly = between(d_score, left = -2, right = 2)) |>
+  filter(bounded_correctly != TRUE) |>
+  nrow() == 0
+  
+```
+
+## Exclusions
+
+Maybe double data? (630625)
+
+```{r}
+
+# exclude participants with incomplete trial data
+data_iat_incomplete_trial_exclusion <- data_iat_clean |> 
+  group_by(unique_id) |> 
+  count() |> 
+  mutate(exclusion_incomplete_trials_IAT = ifelse(n == 120, "include", "exclude"))
+
+# exclude participants with too many fast answers, i.e. bad adherence/performance (more than 10% of the trials are answered faster than 300ms)
+data_iat_fast_answers_exclusion <- data_iat_clean |> 
+  mutate(fast_answer = ifelse(trial_rt < 300, TRUE, FALSE)) |> 
+  group_by(unique_id) |> 
+  summarize(proportion_fast_answer_IAT = mean(fast_answer)) |>
+  mutate(exclusion_IAT_performance = ifelse(proportion_fast_answer_IAT > 0.10, "exclude", "include"))
+
+# exclude participants with bad accuracy (< 75%)
+data_iat_accuracy_exclusion <- data_iat_clean |> 
+  mutate(trial_accuracy = recode(trial_accuracy, "correct" = TRUE, "incorrect" = FALSE)) |> 
+  group_by(unique_id) |> 
+  summarize(proportion_accurate_answers_IAT = mean(trial_accuracy)) |>
+  mutate(exclusion_IAT_accuracy = ifelse(proportion_accurate_answers_IAT < 0.75, "exclude", "include"))
+
+# merge all IAT exclusion tables into one
+data_iat_exclusions <- full_join(data_iat_incomplete_trial_exclusion, data_iat_fast_answers_exclusion, by = "unique_id") |> 
+  full_join(data_iat_accuracy_exclusion, by = "unique_id")
+
+```
+
+## Merge all the IAT Tables
+
+```{r}
+
+data_iat_all <- full_join(data_iat_scored, data_iat_exclusions, by = "unique_id") |> 
+  select(unique_id, d_score, exclusion_incomplete_trials_IAT, exclusion_IAT_performance, exclusion_IAT_accuracy) 
+
+```
+
+# Merge all Tables
+
+```{r} 
+
+data_complete <- full_join(data_demographics_clean, data_bfi_scored, by = "unique_id") |> 
+  full_join(data_iat_all, by = "unique_id")
+
+```
+
+# Master Exclusions
+
+```{r}
+
+data_processed <- data_complete |> 
+  mutate(exclude_participant = case_when(exclusion_incomplete_scale_a == "exclude" ~ "exclude",
+                                         exclusion_incomplete_scale_c == "exclude" ~ "exclude",
+                                         exclusion_incomplete_scale_e == "exclude" ~ "exclude",
+                                         exclusion_incomplete_scale_n == "exclude" ~ "exclude",
+                                         exclusion_incomplete_scale_o == "exclude" ~ "exclude",
+                                         exclude_impossible_values == "exclude" ~ "exclude",
+                                         exclusion_incomplete_trials_IAT == "exclude" ~ "exclude",
+                                         is.na(exclusion_incomplete_trials_IAT) ~ "exclude",
+                                         exclusion_IAT_performance == "exclude" ~ "exclude",
+                                         exclusion_IAT_accuracy == "exclude" ~ "exclude", 
                                          TRUE ~ "include"))
 
 ```
 
-# Write to disk
+# Write to Disk
 
 ```{r}
 
@@ -351,11 +381,10 @@ write_csv(data_processed, "../data/processed/data_processed.csv")
 
 ```
 
-# Create codebook template for the processed data
+
+# Create Codebook Template for the Processed Data
 
 If it has not already been created, this code write the codebook template to disk. 
-
-\TODO The template should then be filled in manually with descriptions of each variable so that someone else could understand what these variables represent. 
 
 ```{r}
 
@@ -370,18 +399,8 @@ if(!file.exists("../data/processed/data_processed_codebook.xlsx")){
 
 ```
 
-Note that there are other ways of automatically creating more elaborate codebooks from your datasets. These often contain information about min/max/mean/SD, distribution, etc. For example:
 
-- Ruben Arslan's {codebook}
-  - [R package with How-Tos](https://rubenarslan.github.io/codebook/)
-  - [Tutorial](https://rubenarslan.github.io/codebook/articles/codebook_tutorial.html)
-  - [Article](https://journals.sagepub.com/doi/full/10.1177/2515245919838783)
-- Petersen & Ekstrøm's {dataReporter}
-  - [Article](https://www.jstatsoft.org/article/view/v090i06)
-  - [Blog](https://sandsynligvis.dk/2017/08/21/datamaid-your-personal-assistant-for-cleaning-up-the-data-cleaning-process/)
-  - [R package](https://cran.r-project.org/web/packages/dataReporter/index.html)
-
-# Session info
+# Session Info
 
 ```{r}
 

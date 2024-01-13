@@ -25,6 +25,10 @@ knitr::opts_chunk$set(message = FALSE,
 library(tidyverse)
 library(faux)
 library(janitor)
+library(ggrepel)
+library(wesanderson)
+library(ggrepel)
+library(scales)
 
 ```
 
@@ -53,41 +57,136 @@ Consider making use of the many extensions to ggplot2, e.g.:
 
 # Simulate dataset
 
-This code block simulates the data set used for the plots. The researchers who planned and performed this (hypothetical) experiment are investigating the effects of interacting with animals on subsequent human social behavior. Specifically, they hypothesized that interacting with a cute charming cat ahead of a public goods game leads to more prosocial decisions. A within design was used to confirm this hypothesis: Participants were invited two times into the lab (with the appointments being one week apart) where they either had the possibility to play with a cat for 15min (cat condition) or build stone towers for the same amount of time (stone condition). After these 15min, the participants took part in a public goods game with real-life consequences (some trials were chosen randomly and the participants were paid accordingly). Lastly, participants were asked to rate how enjoyable the activity before the game was and indicate their baseline fascination with cats (in the cat condition) or stone tower building (in the stone condition). All in all, the data of 106 participants was acquired.
+This code block simulates the data set used for the plots. The researchers who planned and performed this (hypothetical) experiment are investigating the effects of interacting with animals on subsequent human social behavior. Specifically, they hypothesized that interacting with a cute charming cat ahead of a public goods game leads to more prosocial decisions. A within design was used to confirm this hypothesis: Participants were invited two times into the lab (with the appointments being one week apart) where they either had the possibility to play with a cat for 15min (cat condition) or build stone towers for the same amount of time (stone condition). The repeated measure design was counterbalanced. After these 15min, the participants took part in a public goods game with real-life consequences (some trials were chosen randomly and the participants were paid accordingly). The researchers were especially interested in how much money people donate to the common pool. The variable of interest was the mean donation over 10 game rounds in each condition. All in all, the data of 96 participants was acquired.
+
+```{r, fig.show='hide'}
+set.seed(9)
+
+data <- sim_design(within = list(condition = c(cat = "Cat Condition", stone = "Stone Tower Condtion")),
+                   n = c(106),
+                   mu = c(17, 14),
+                   sd = c(8, 4),
+                   r = .5)
+
+```
+
+# Save data set
 
 ```{r}
 
-between <- list(condition = c(cat = "Cat Condition", 
-                              stone = "Stone Tower Condition"))
-               
-mu <- data.frame(
-  cat    = 20,
-  stone  = 23
-)
-df <- sim_design(between, 
-                 n = 106, mu = mu, 
-                 sd = 5, r = .5)
+# in case this dir doesn't exist, create it
+dir.create("../data/")
+
+# save data to disk in that dir
+write_csv(data, "../data/data.csv")
 
 ```
+
+# Load data set
+
+```{r}
+
+data_for_plot <- read_csv("data/data.csv")
+
+```
+
 
 # Good plot
 
-Do something challenging, but not something so complex that it is useless 
-(good example: Raincloud plots)
-
 ```{r}
 
+# do some data wrangling to get the slope directions (relevant for the plot)
+n_slopes <- data_for_plot |>
+  mutate(slope_positive = ifelse((stone - cat > 0), TRUE, FALSE)) |> 
+  summarize(n = sum(slope_positive))
+ 
+# do some additional data wrangling to get the right data format for the plot
+data_for_good_plot <- data_for_plot |>
+  pivot_longer(cols = c("cat", "stone"), names_to = "condition", values_to = "values") |> 
+  mutate(id = as.factor(id),
+         condition = as.factor(condition)) 
 
+# plot the data
+plot_good <- 
+  ggplot(data_for_good_plot, aes(x = condition, y = values, fill = condition)) +
+  geom_boxplot(notch = TRUE, width = .2, alpha = .5) +
+  geom_point(aes(colour = condition), alpha = .3, position = position_nudge(x = c(.2, -.2))) +
+  geom_line(aes(group = id), alpha = .2, linewidth = .5, position = position_nudge(x = c(.2, -.2))) +
+  annotate("text", x=1.5, y=40, label = paste0("Positive Slopes / Negative Slopes: ", n_slopes, " / ", nrow(data_for_plot) - n_slopes)) +
+  stat_summary(fun = "median", geom = "point", size = 2, colour = "black", position = position_nudge(x = c(.2, -.2))) +
+  stat_summary(group = 1, fun = "median", geom = "line", linewidth = 1.5, colour = "black", position = position_nudge(x = c(.2, -.2))) +
+  xlab("Condition") +
+  ylab("Mean Donation (in Francs)") +
+  ggtitle("Condition Effect on Donations in a Public Goods Game") +
+  scale_y_continuous(limits = c(0,40)) +
+  scale_x_discrete(labels = c("Cat Condition", "Stone Condition"), expand = c(.15, .15)) +
+  theme_classic() +
+  theme(legend.position="none",
+        plot.title = element_text(size = 15, face = "bold", hjust = .5)) +
+  scale_fill_manual(values = wes_palette("GrandBudapest1", n = 2, type = "discrete")) +
+  scale_color_manual(values = wes_palette("GrandBudapest1", n = 2, type = "continuous"))
+
+plot_good
 
 ```
+
+The plot above depicts the difference between the two conditions in the mean donations. This is a good plot for simple group comparisons for several reasons:
+
+- It shows the distribution of the data in both conditions. The "scatter plot" part of the plot shows the distribution of the single data points, while the box plot provides a summary of the data in more dense regions (where the single data points overlap strongly). Showing the single data points does not only help to get a better grasp of the underlying distribution (central tendency and dispersion), but it also helps spotting possible outliers and quickly.
+
+- This plot contains important multilevel information: The gray lines which connect the single data points of both conditions (i.e. the data of one participant) show the "direction" of the individual effect. This supports finding individual differences between participants (e.g. participants who were very susceptible to the cat but not to the stones or vica versa) and might hint at possible moderator variables. The thick black line indicates the group effect (i.e. summary statistics) and gives intuitive information about the size of the overall effect. This is also supported by the displayed positive/negative slope ratio, which adds information about the general tendency in the sample. When comparing groups, a plot like that might be really helpful, because we might find that while there is no difference between the two conditions on a central tendency level, there are two groups of participants who react differently to one conditions (e.g. cat lovers vs. people with cat allergy). Thus, without such information, important effects might be obscured.
+
+- The plot is simple and constraint to the most important information. There is no abundance of colors or graphical elements, the scaling is appropriate (i.e starts from zero), plot and its axes are named concretely and clearly.
+
 
 # Bad plot
 
 ```{r}
 
+# Conduct a median split on the mean donations in the cat condition (see below for an explanation)
+data_for_bad_plot <- data_for_plot |>
+  mutate(cat_love = ifelse(cat >  median(cat), "High donators", "Low donators"),
+         cat_love = as.factor(cat_love),
+         id = as.factor(id))
 
+# Plot the data 
+bad_plot <-
+  ggplot(data_for_bad_plot, 
+         aes(x = cat, y = stone, label = id)) +
+  geom_jitter(aes(color = cat_love), size = 6, shape = 8, alpha = 0.3) +
+  labs(color = "Legend 1") +
+  labs(fill="Legend 2") +
+  geom_text_repel(color = "black") +
+  geom_smooth(aes(label = 1, group = cat_love, fill = cat_love), se = TRUE, method = "lm", color = "white", linewidth = 2, fullrange = TRUE) +
+  geom_smooth(aes(label = 1), se = TRUE, method = "lm", color = "lightgrey", linewidth = 1.5, fullrange = TRUE) +
+  scale_x_continuous(limits = c(0, 30), breaks = pretty_breaks(n = 4)) +
+  scale_y_continuous(limits = c(-30, 40), breaks = pretty_breaks(n = 4)) +
+  xlab("Condition 1") +
+  ylab("Condition 2") +
+  ggtitle("Scatter plot") +
+  scale_fill_manual(values=c("#619CFF", "#F8766D")) +
+  theme(panel.grid = element_line(color = "gray",
+                                  linewidth = 3,
+                                  linetype = 3),
+        panel.background = element_rect(fill = "white",
+                                colour = "white"),
+        plot.title = element_text(size = 9, face = "italic"),
+        axis.title = element_text(size=14, face="bold"))
+
+bad_plot
 
 ```
+
+As opposed to the group comparison plot above, this plot tries to investigate the relationship between the two variables. More concretely, the researchers were interested in the hypothesis that donations after cat encounters also predict donations in the stone condition. They also had the idea, that cat people might be more prosocial in general. Thus, they formed two groups, splitting the participants according to their mean donation values in the cat condition (median split) as an (obviously bad) indicator for cat liking. They then performed a linear regression analysis for the whole sample and the two groups. The results are depicted here.
+
+- Regression lines: While we can see general effect tendencies, the regression lines and their confidence intervals strongly overlap in this plot. Consequently, it is hard to see which data points and which confidence interval range belongs to which regression line. Additionally, while the legends describe the coloring/grouping scheme, it is not intuitive at all. For example, while the high donator data points are red, their associated regression line is blue (which is the color of the low donator data points). The overlapping color palette makes it hard to quickly spot the relevant information, since the single data points are "swallowed" by surrounding colors. Importantly, it would have probably been better to not use "fullrange" regression lines or plot grouped data in separated plots.
+
+- Captions and Annotation: The plot is clearly missing a clear title and concrete axes labels. Even if an additional text were to mention which condition is which, this is bad plotting, because it cannot convey important information on its own. An appropriate annotation or caption is also missing. For example, it does not mention that the points are jittered and thus not representing the exact data values. It does also not mention, which unit the values are in or where the scale originally started or ended (this is important because one scale is negative and the other is not).
+
+- Shape, labeling, and grid: The shape of the points representing the data values is inappropriate. They are too big and overlaps are hard to disentangle visually due to the inconvenient form. The rather high transparency of the points adds to this. While labeling of data values might be useful in some cases, it does barely contain any information in this case (since there are also no apparent outliers). Consequently, the labels just add confusion and make it harder to grasp the relevant information. Additionally, the labels overlap with the grid and the data points, thus making it even hard to read the labels effortlessly. Also, while a grid can be helpful in adding structure to visual elements of a plot, this is definitely not the case here. The weirdly arranged grid adds a lot of confusion to the exact values and the grid lines in general.
+
+- Scales: The scale does not suit the data, neither on the x- nor the y-axis. In the case of the x-axis, the scale breaks are placed in a way that data is cut off. This is especially bad, because it also influences the slope of the regression lines. In contrast, the y-axis contains a range of values which is not even important for this data (donations can only be positive), thus leading to a lot of empty space and distraction from the relevant information. 
+
 
 # Write to disk
 
@@ -96,6 +195,24 @@ Write to disk as a .pdf or .png.
 Name them "plot_good_[yourname]" and "plot_bad_[yourname]".
 
 ```{r}
+
+dir.create("plots")
+
+# save good plot
+ggsave("plot_good_André_Minder.png",
+       plot = plot_good,
+       width = 12,
+       height = 8,
+       dpi = 300, 
+       path = "plots")
+
+# save bad plot
+ggsave("plot_bad_André_Minder.png",
+       plot = bad_plot,
+       width = 12,
+       height = 8,
+       dpi = 300, 
+       path = "plots")
 
 
 
