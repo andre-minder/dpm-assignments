@@ -430,6 +430,7 @@ data_complete <- full_join(data_demographics_clean, data_bfi_scored, by = "uniqu
 
 ```
 
+
 # Master Exclusions
 
 Apply master exclusions. Note that participants with no IAT data are also marked as excluded here (based on the rational that they do not have 120 IAT trials). This keeps them out of the analysis.

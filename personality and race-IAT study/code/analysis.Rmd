@@ -189,17 +189,19 @@ psych::alpha(subset(data_processed_after_exclusions, select = c(bfi_o1:bfi_o10))
 
 ### Descriptive Plots
 
+This sections prints a series of histograms for all BFI subscale means and the D-score of the IAT.
+
 ```{r} 
 
 # Histogram for mean agreeableness (BFI)
 ggplot(data_processed_after_exclusions, aes(x = bfi_mean_a)) +
   geom_histogram(binwidth = 1,
                  boundary = 0,
-                 fill = viridis_pal(begin = 0.45, option = "mako")(1), 
-                 color = viridis_pal(begin = 0.30, option = "mako")(1)) + 
+                 fill = viridis_pal(begin = 0.05, option = "plasma")(1), 
+                 color = viridis_pal(begin = 0.10, option = "plasma")(1)) + 
   xlab("Mean Agreeableness") +
   ylab("Frequency") +
-  theme_linedraw() +
+  theme_classic() +
   scale_x_continuous(breaks = pretty_breaks(n = 5)) +
   ggtitle("Histogram for BFI Agreeableness") +
   coord_cartesian(xlim = c(1, 6)) +
@@ -209,11 +211,11 @@ ggplot(data_processed_after_exclusions, aes(x = bfi_mean_a)) +
 ggplot(data_processed_after_exclusions, aes(x = bfi_mean_c)) +
   geom_histogram(binwidth = 1,
                  boundary = 0,
-                 fill = viridis_pal(begin = 0.45, option = "mako")(1), 
-                 color = viridis_pal(begin = 0.30, option = "mako")(1)) + 
+                 fill = viridis_pal(begin = 0.05, option = "plasma")(1), 
+                 color = viridis_pal(begin = 0.10, option = "plasma")(1)) + 
   xlab("Mean Conscientiousness") +
   ylab("Frequency") +
-  theme_linedraw() +
+  theme_classic() +
   scale_x_continuous(breaks = pretty_breaks(n = 5)) +
   ggtitle("Histogram for BFI Conscientiousness") +
   coord_cartesian(xlim = c(1, 6)) +
@@ -223,11 +225,11 @@ ggplot(data_processed_after_exclusions, aes(x = bfi_mean_c)) +
 ggplot(data_processed_after_exclusions, aes(x = bfi_mean_e)) +
   geom_histogram(binwidth = 1,
                  boundary = 0,
-                 fill = viridis_pal(begin = 0.45, option = "mako")(1), 
-                 color = viridis_pal(begin = 0.30, option = "mako")(1)) + 
+                 fill = viridis_pal(begin = 0.05, option = "plasma")(1), 
+                 color = viridis_pal(begin = 0.10, option = "plasma")(1)) + 
   xlab("Mean Extroversion") +
   ylab("Frequency") +
-  theme_linedraw() +
+  theme_classic() +
   scale_x_continuous(breaks = pretty_breaks(n = 5)) +
   ggtitle("Histogram for BFI Extroversion") +
   coord_cartesian(xlim = c(1, 6)) +
@@ -237,11 +239,11 @@ ggplot(data_processed_after_exclusions, aes(x = bfi_mean_e)) +
 ggplot(data_processed_after_exclusions, aes(x = bfi_mean_n)) +
   geom_histogram(binwidth = 1,
                  boundary = 0,
-                 fill = viridis_pal(begin = 0.45, option = "mako")(1), 
-                 color = viridis_pal(begin = 0.30, option = "mako")(1)) + 
+                 fill = viridis_pal(begin = 0.05, option = "plasma")(1), 
+                 color = viridis_pal(begin = 0.10, option = "plasma")(1)) +  
   xlab("Mean Neuroticism") +
   ylab("Frequency") +
-  theme_linedraw() +
+  theme_classic() +
   scale_x_continuous(breaks = pretty_breaks(n = 5)) +
   ggtitle("Histogram for BFI Neuroticism") +
   coord_cartesian(xlim = c(1, 6)) +
@@ -251,11 +253,11 @@ ggplot(data_processed_after_exclusions, aes(x = bfi_mean_n)) +
 ggplot(data_processed_after_exclusions, aes(x = bfi_mean_o)) +
   geom_histogram(binwidth = 1,
                  boundary = 0,
-                 fill = viridis_pal(begin = 0.45, option = "mako")(1), 
-                 color = viridis_pal(begin = 0.30, option = "mako")(1)) + 
+                 fill = viridis_pal(begin = 0.05, option = "plasma")(1), 
+                 color = viridis_pal(begin = 0.10, option = "plasma")(1)) + 
   xlab("Mean Openness") +
   ylab("Frequency") +
-  theme_linedraw() +
+  theme_classic() +
   scale_x_continuous(breaks = pretty_breaks(n = 5)) +
   ggtitle("Histogram for BFI Openness") +
   coord_cartesian(xlim = c(1, 6)) +
@@ -265,11 +267,11 @@ ggplot(data_processed_after_exclusions, aes(x = bfi_mean_o)) +
 ggplot(data_processed_after_exclusions, aes(x = d_score)) +
   geom_histogram(binwidth = 0.20,
                  boundary = 0,
-                 fill = viridis_pal(begin = 0.45, option = "mako")(1), 
-                 color = viridis_pal(begin = 0.30, option = "mako")(1)) + 
+                 fill = viridis_pal(begin = 0.05, option = "plasma")(1), 
+                 color = viridis_pal(begin = 0.10, option = "plasma")(1)) + 
   xlab("D-score") +
   ylab("Frequency") +
-  theme_linedraw() +
+  theme_classic() +
   scale_x_continuous(breaks = pretty_breaks(n = 5)) +
   ggtitle("Histogram for IAT D-score") +
   coord_cartesian(xlim = c(-2, 2)) +
@@ -283,10 +285,11 @@ ggplot(data_processed_after_exclusions, aes(x = d_score)) +
 
 data_processed_after_exclusions |> 
   select(bfi_mean_a, bfi_mean_c, bfi_mean_e, bfi_mean_n, bfi_mean_o, d_score) |> 
-  cor(use = "pairwise.complete.obs") |> 
+  cor(use = "pairwise.complete.obs", method = "pearson") |> 
   as.data.frame() |> 
   mutate_all(.funs = round_half_up, digits = 2) |> 
   kable() |>
+  add_header_above(header = c("Correlation Matrix IAT - BFI" = 7)) |> 
   kable_classic(full_width = FALSE)
 
 ```
