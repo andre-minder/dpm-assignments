@@ -44,8 +44,10 @@ Load the processed data and apply the master exclusions.
 
 ```{r}
 
+# read in data
 data_processed <- read_csv("../data/processed/data_processed.csv")
 
+# apply master exclusions
 data_processed_after_exclusions <- data_processed |>
   filter(exclude_participant == "include")
 
@@ -64,7 +66,7 @@ Sample size before master exclusions are applied.
 data_processed |>
   count(name = "n") |>
   kable() |>
-  add_header_above(header = c("Whole sample" = 1)) |> 
+  add_header_above(header = c("Whole sample" = 1)) |> # print the results as a nice table with a header
   kable_classic(full_width = FALSE)
 
 ```
@@ -78,7 +80,7 @@ Sample size after master exclusions are applied. This sample is used for the sub
 data_processed_after_exclusions |>
   count(name = "n") |>
   kable() |>
-  add_header_above(header = c("For analysis" = 1)) |>
+  add_header_above(header = c("For analysis" = 1)) |> # print the results as a nice table with a header
   kable_classic(full_width = FALSE)
 
 ```
@@ -86,15 +88,16 @@ data_processed_after_exclusions |>
 ## Age
 
 Age descriptives of the analysis sample.
+
 ```{r}
 
 data_processed_after_exclusions |>
   mutate(age = as.numeric(age)) |>
   summarise(Mean = mean(age, na.rm = TRUE),
             SD = sd(age, na.rm = TRUE)) |>
-  mutate_all(.funs = janitor::round_half_up, digits = 1) |>
+  mutate_all(.funs = janitor::round_half_up, digits = 1) |> 
   kable() |>
-  add_header_above(header = c("Age" = 2)) |>
+  add_header_above(header = c("Age" = 2)) |> # print the results as a nice table with a header
   kable_classic(full_width = FALSE)
 
 ```
@@ -102,6 +105,7 @@ data_processed_after_exclusions |>
 ## Gender
 
 Gender descriptives of the analysis sample. 
+
 ```{r}
 
 data_processed_after_exclusions |> 
@@ -115,7 +119,7 @@ data_processed_after_exclusions |>
 
 ```
 
-## Available Demographics Data
+## Available Demographic Data
 
 Proportion of the available demographics data in the analysis. Some participants have missing demographics data, because providing it was optional.
 
@@ -144,50 +148,52 @@ This section contains descriptive statistics and plots for the BFI and the IAT. 
 - Descriptive plots (histograms) for all BFI facets and the IAT D-score
 - Correlation matrix for the BFI facets and the IAT D-score
 
-## BFI
+## Cronbach's Alpha
 
-### Cronbach's alpha
-
-#### Agreeablessness
+### Agreeablessness
 ```{r}
 
+# calculate Cronbach's alpha for the agreeableness subscale
 psych::alpha(subset(data_processed_after_exclusions, select = c(bfi_a1:bfi_a9)))
 
 ```
-#### Conscientiousness
+### Conscientiousness
 
 ```{r}
 
+# calculate Cronbach's alpha for the conscientiousness subscale
 psych::alpha(subset(data_processed_after_exclusions, select = c(bfi_c1:bfi_c9)))
 
 ```
 
-#### Extroversion
+### Extroversion
 
 ```{r}
 
+# calculate Cronbach's alpha for the extroversion subscale
 psych::alpha(subset(data_processed_after_exclusions, select = c(bfi_e1:bfi_e8)))
 
 ```
 
-#### Neuroticism
+### Neuroticism
 
 ```{r}
 
+# calculate Cronbach's alpha for the neuroticism subscale
 psych::alpha(subset(data_processed_after_exclusions, select = c(bfi_n1:bfi_n8)))
 
 ```
 
-#### Openness
+### Openness
 
 ```{r}
 
+# calculate Cronbach's alpha for the openness subscale
 psych::alpha(subset(data_processed_after_exclusions, select = c(bfi_o1:bfi_o10)))
 
 ```
 
-
-### Descriptive Plots
+## Descriptive Plots
 
 This sections prints a series of histograms for all BFI subscale means and the D-score of the IAT.
 
@@ -204,8 +210,7 @@ ggplot(data_processed_after_exclusions, aes(x = bfi_mean_a)) +
   theme_classic() +
   scale_x_continuous(breaks = pretty_breaks(n = 5)) +
   ggtitle("Histogram for BFI Agreeableness") +
-  coord_cartesian(xlim = c(1, 6)) +
-  theme(panel.grid.minor = element_blank())
+  coord_cartesian(xlim = c(1, 6))
 
 # Histogram for mean conscientiousness (BFI)
 ggplot(data_processed_after_exclusions, aes(x = bfi_mean_c)) +
@@ -218,8 +223,7 @@ ggplot(data_processed_after_exclusions, aes(x = bfi_mean_c)) +
   theme_classic() +
   scale_x_continuous(breaks = pretty_breaks(n = 5)) +
   ggtitle("Histogram for BFI Conscientiousness") +
-  coord_cartesian(xlim = c(1, 6)) +
-  theme(panel.grid.minor = element_blank())
+  coord_cartesian(xlim = c(1, 6))
 
 # Histogram for mean extroversion (BFI)
 ggplot(data_processed_after_exclusions, aes(x = bfi_mean_e)) +
@@ -232,8 +236,7 @@ ggplot(data_processed_after_exclusions, aes(x = bfi_mean_e)) +
   theme_classic() +
   scale_x_continuous(breaks = pretty_breaks(n = 5)) +
   ggtitle("Histogram for BFI Extroversion") +
-  coord_cartesian(xlim = c(1, 6)) +
-  theme(panel.grid.minor = element_blank())
+  coord_cartesian(xlim = c(1, 6))
 
 # Histogram for mean neuroticism (BFI)
 ggplot(data_processed_after_exclusions, aes(x = bfi_mean_n)) +
@@ -246,8 +249,7 @@ ggplot(data_processed_after_exclusions, aes(x = bfi_mean_n)) +
   theme_classic() +
   scale_x_continuous(breaks = pretty_breaks(n = 5)) +
   ggtitle("Histogram for BFI Neuroticism") +
-  coord_cartesian(xlim = c(1, 6)) +
-  theme(panel.grid.minor = element_blank())
+  coord_cartesian(xlim = c(1, 6))
 
 # Histogram for mean openness (BFI)
 ggplot(data_processed_after_exclusions, aes(x = bfi_mean_o)) +
@@ -260,8 +262,7 @@ ggplot(data_processed_after_exclusions, aes(x = bfi_mean_o)) +
   theme_classic() +
   scale_x_continuous(breaks = pretty_breaks(n = 5)) +
   ggtitle("Histogram for BFI Openness") +
-  coord_cartesian(xlim = c(1, 6)) +
-  theme(panel.grid.minor = element_blank())
+  coord_cartesian(xlim = c(1, 6))
   
 # Histogram for D-score (IAT)
 ggplot(data_processed_after_exclusions, aes(x = d_score)) +
@@ -274,15 +275,15 @@ ggplot(data_processed_after_exclusions, aes(x = d_score)) +
   theme_classic() +
   scale_x_continuous(breaks = pretty_breaks(n = 5)) +
   ggtitle("Histogram for IAT D-score") +
-  coord_cartesian(xlim = c(-2, 2)) +
-  theme(panel.grid.minor = element_blank())
+  coord_cartesian(xlim = c(-2, 2))
 
 ```
 
-### Correlation Matrix IAT - BFI
+## Correlation Matrix IAT - BFI
 
 ```{r}
 
+# construct a correlation matrix (Pearson's r), round the results (2 digits), and print it as a nice table with a header
 data_processed_after_exclusions |> 
   select(bfi_mean_a, bfi_mean_c, bfi_mean_e, bfi_mean_n, bfi_mean_o, d_score) |> 
   cor(use = "pairwise.complete.obs", method = "pearson") |> 
@@ -296,12 +297,13 @@ data_processed_after_exclusions |>
 
 # Analyses & Hypothesis Tests
 
-## T-test: Comparing Genders (IAT)
+## T-Test: Comparing Genders (IAT)
 
 Conduct a two sample t-test for the hypothesis that the D-score differs between female and male.
 
 ```{r}
 
+# Filter out participants with missing sex values and conduct a two-sample t-test. Report the results with report()
 data_processed_after_exclusions |> 
   filter(sex != "missing/error/others") |> 
   with(t.test(d_score ~ sex)) |> 
@@ -367,13 +369,13 @@ lm(d_score ~ bfi_mean_o, data = data_processed_after_exclusions) |>
 ```
 
 
-## Plots: IAT and BFI
+## Plots: IAT and BFI (Scatter Plots)
 
 ```{r}
 
 # Scatter plot: Agreeableness
 plot_iat_bfi_a <- data_processed_after_exclusions |> 
-  mutate(extreme_values = ifelse(between(d_score, quantile(d_score, 0.1), quantile(d_score, 0.9)), "Normal Values", "Extreme Values")) |> 
+  mutate(extreme_values = ifelse(between(d_score, quantile(d_score, 0.1), quantile(d_score, 0.9)), "Normal Values", "Extreme Values")) |> # define the extreme values via quantiles (Extreme values are defined as the bottom and top 10% values)
   ggplot(aes(x = bfi_mean_a, y = d_score, group = extreme_values)) +
   geom_point(aes(shape = extreme_values, color = extreme_values), alpha = 0.8) +
   geom_smooth(aes(group = 1), method = "lm", fullrange = TRUE) +
@@ -385,11 +387,10 @@ plot_iat_bfi_a <- data_processed_after_exclusions |>
   ylab("D-score") +
   ggtitle("Scatter Plot: Agreeableness and D-score") +
   theme_classic() +
-  theme(plot.caption = element_text(hjust = 0),
-        legend.position = c(0.9, 0.9)) +
-  guides(color = guide_legend("Outliers"),
+  theme(legend.position = c(0.9, 0.9)) + # change legend position
+  guides(color = guide_legend("Outliers"), # rename the legend
          shape = guide_legend("Outliers")) +
-  scale_shape_manual(values = c(17,16)) +
+  scale_shape_manual(values = c(17,16)) + # change the shapes
   scale_color_manual(values = wes_palette("GrandBudapest1", n = 2, type = "continuous"))
 
 
@@ -403,12 +404,11 @@ plot_iat_bfi_c <- data_processed_after_exclusions |>
                      limits = c(1, 6)) +
   scale_y_continuous(breaks = pretty_breaks(n = 8),
                      limits = c(-2, 2)) +
-  xlab("Mean Contientiousness") +
+  xlab("Mean Conscientiousness") +
   ylab("D-score") +
-  ggtitle("Scatter Plot: Contientiousness and D-score") +
+  ggtitle("Scatter Plot: Conscientiousness and D-score") +
   theme_classic() +
-  theme(plot.caption = element_text(hjust = 0),
-        legend.position = c(0.9, 0.9)) +
+  theme(legend.position = c(0.9, 0.9)) +
   guides(color = guide_legend("Outliers"),
          shape = guide_legend("Outliers")) +
   scale_shape_manual(values = c(17,16)) +
@@ -429,8 +429,7 @@ plot_iat_bfi_e <- data_processed_after_exclusions |>
   ylab("D-score") +
   ggtitle("Scatter Plot: Extroversion and D-score") +
   theme_classic() +
-  theme(plot.caption = element_text(hjust = 0),
-        legend.position = c(0.9, 0.9)) +
+  theme(legend.position = c(0.9, 0.9)) +
   guides(color = guide_legend("Outliers"),
          shape = guide_legend("Outliers")) +
   scale_shape_manual(values = c(17,16)) +
@@ -451,8 +450,7 @@ plot_iat_bfi_n <- data_processed_after_exclusions |>
   ylab("D-score") +
   ggtitle("Scatter Plot: Neuroticism and D-score") +
   theme_classic() +
-  theme(plot.caption = element_text(hjust = 0),
-        legend.position = c(0.9, 0.9)) +
+  theme(legend.position = c(0.9, 0.9)) +
   guides(color = guide_legend("Outliers"),
          shape = guide_legend("Outliers")) +
   scale_shape_manual(values = c(17,16)) +
@@ -473,8 +471,7 @@ plot_iat_bfi_o <- data_processed_after_exclusions |>
   ylab("D-score") +
   ggtitle("Scatter Plot: Openness and D-score") +
   theme_classic() +
-  theme(plot.caption = element_text(hjust = 0),
-        legend.position = c(0.9, 0.9)) +
+  theme(legend.position = c(0.9, 0.9)) +
   guides(color = guide_legend("Outliers"),
          shape = guide_legend("Outliers")) +
   scale_shape_manual(values = c(17,16)) +
@@ -487,11 +484,13 @@ plot_iat_bfi_o <- data_processed_after_exclusions |>
 
 ```{r, fig.dim = c(12, 8)}
 
+# combining the scatter plots and adding title and caption
 all_scatter_plots <- plot_iat_bfi_a + plot_iat_bfi_c + plot_iat_bfi_e + plot_iat_bfi_n + plot_iat_bfi_o +
   plot_layout(widths = c(1, 1)) +
   plot_annotation(title = "Scatter Plots: IAT and BFI Facets",
                   caption = "Note: Extreme values are defined as the top/bottom 10% of the values.")
 
+# print the combined plots (and suppress the warning/information messages)
 print(all_scatter_plots) |> 
   suppressMessages() |> 
   suppressWarnings()
@@ -502,8 +501,10 @@ print(all_scatter_plots) |>
 
 ```{r}
 
+# create a folder plots if it does not exist yet
 dir.create("../communications/plots")
 
+# save the combined plot as a png
 ggsave("iat_bfi_scatter_plots.png",
        plot = all_scatter_plots,
        width = 15,
@@ -511,6 +512,7 @@ ggsave("iat_bfi_scatter_plots.png",
        dpi = 300, 
        path = "../communications/plots")
 
+# save the combined plot as a pdf
 ggsave("iat_bfi_scatter_plot.pdf",
        plot = all_scatter_plots,
        width = 15,

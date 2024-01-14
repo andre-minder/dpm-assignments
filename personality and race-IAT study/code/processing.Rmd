@@ -113,8 +113,8 @@ data_bfi_recoded |>
   select(starts_with("bfi_a")) |> 
   cor(use = "pairwise.complete.obs") |> 
   as.data.frame() |> 
-  summarize(across(where(is.numeric), ~ all(. > 0))) |> 
-  all()
+  summarize(across(where(is.numeric), ~ all(. > 0))) |> # summarize all positive values
+  all() # check if all values are positive
   
 
 ```
@@ -134,8 +134,8 @@ data_bfi_recoded |>
   select(starts_with("bfi_c")) |> 
   cor(use = "pairwise.complete.obs") |> 
   as.data.frame() |> 
-  summarize(across(where(is.numeric), ~ all(. > 0))) |> 
-  all()
+  summarize(across(where(is.numeric), ~ all(. > 0))) |> # summarize all positive values
+  all() # check if all values are positive
 
 ```
 
@@ -154,8 +154,8 @@ data_bfi_recoded |>
   select(starts_with("bfi_e")) |> 
   cor(use = "pairwise.complete.obs") |> 
   as.data.frame() |> 
-  summarize(across(where(is.numeric), ~ all(. > 0))) |> 
-  all()
+  summarize(across(where(is.numeric), ~ all(. > 0))) |> # summarize all positive values
+  all() # check if all values are positive
 
 ```
 
@@ -174,8 +174,8 @@ data_bfi_recoded |>
   select(starts_with("bfi_n")) |> 
   cor(use = "pairwise.complete.obs") |>
   as.data.frame() |> 
-  summarize(across(where(is.numeric), ~ all(. > 0))) |> 
-  all()
+  summarize(across(where(is.numeric), ~ all(. > 0))) |>  # summarize all positive values
+  all() # check if all values are positive
 
 ```
 
@@ -194,8 +194,8 @@ data_bfi_recoded |>
   select(starts_with("bfi_o")) |> 
   cor(use = "pairwise.complete.obs") |>
   as.data.frame()|> 
-  summarize(across(where(is.numeric), ~ all(. > 0))) |> 
-  all()
+  summarize(across(where(is.numeric), ~ all(. > 0))) |> # summarize all positive values
+  all() # check if all values are positive
 
 ```
 
@@ -317,6 +317,7 @@ data_bfi_scored |>
 ## Cleaning
 
 This section cleans the IAT data (get the right column headers, clean the column names, rename the columns/variables, select relevant variables and blocks)
+
 ```{r IAT}
 
 # Some data wrangling/tidying for the IAT data (change header names, clean/rename header names, select relevant columns and rows)
@@ -326,7 +327,7 @@ data_iat_clean <- data_iat |>
   rename(trial_rt = trial_reaction_time_in_ms) |> 
   select(unique_id, block_number, trial_accuracy, trial_rt) |>
   mutate(trial_rt = as.numeric(trial_rt)) |> 
-  filter(!block_number %in% c(1,2,5))
+  filter(!block_number %in% c(1,2,5)) # filter out non-critical blocks 
 
 ```
 
@@ -364,8 +365,8 @@ data_iat_scored <- full_join(data_iat_mean1, data_iat_mean2, by = "unique_id") |
 # Sanity check (scores are bounded between -2 and +2)
 data_iat_scored |> 
   mutate(bounded_correctly = between(d_score, left = -2, right = 2)) |>
-  filter(bounded_correctly != TRUE) |>
-  nrow() == 0
+  filter(bounded_correctly != TRUE) |> # filter out the rows with values that surpass the bounds
+  nrow() == 0 # number of rows should be zero (no bounds are crossed)
   
 ```
 
@@ -382,7 +383,7 @@ At the end, all exclusion data frames are joined together.
 
 ```{r}
 
-# exclude participants with incomplete/deviating trial data
+# exclude participants with incomplete/deviating trial data (deviating from 120 trials)
 data_iat_incomplete_trial_exclusion <- data_iat_clean |> 
   group_by(unique_id) |> 
   count() |> 
@@ -390,17 +391,17 @@ data_iat_incomplete_trial_exclusion <- data_iat_clean |>
 
 # exclude participants with too many fast answers, i.e. bad adherence/performance (more than 10% of the trials are answered faster than 300ms)
 data_iat_fast_answers_exclusion <- data_iat_clean |> 
-  mutate(fast_answer = ifelse(trial_rt < 300, TRUE, FALSE)) |> 
+  mutate(fast_answer = ifelse(trial_rt < 300, TRUE, FALSE)) |> # mark fast responses (< 300ms)
   group_by(unique_id) |> 
   summarize(proportion_fast_answer_IAT = mean(fast_answer)) |>
-  mutate(exclusion_IAT_performance = ifelse(proportion_fast_answer_IAT > 0.10, "exclude", "include"))
+  mutate(exclusion_IAT_performance = ifelse(proportion_fast_answer_IAT > 0.10, "exclude", "include")) # mark participants as excluded if they answer fast in more than 10% of the trials
 
 # exclude participants with bad accuracy (< 75%)
 data_iat_accuracy_exclusion <- data_iat_clean |> 
-  mutate(trial_accuracy = recode(trial_accuracy, "correct" = TRUE, "incorrect" = FALSE)) |> 
+  mutate(trial_accuracy = recode(trial_accuracy, "correct" = TRUE, "incorrect" = FALSE)) |> # recode the accuracy variable to get the proportion of accurate answers more easily
   group_by(unique_id) |> 
   summarize(proportion_accurate_answers_IAT = mean(trial_accuracy)) |>
-  mutate(exclusion_IAT_accuracy = ifelse(proportion_accurate_answers_IAT < 0.75, "exclude", "include"))
+  mutate(exclusion_IAT_accuracy = ifelse(proportion_accurate_answers_IAT < 0.75, "exclude", "include")) # mark participants as excluded if they have an accuracy below 75%
 
 # merge all IAT exclusion tables into one
 data_iat_exclusions <- full_join(data_iat_incomplete_trial_exclusion, data_iat_fast_answers_exclusion, by = "unique_id") |> 
@@ -437,6 +438,7 @@ Apply master exclusions. Note that participants with no IAT data are also marked
 
 ```{r}
 
+# Mark participants as excluded if they have been excluded according to any of the exclusion criteria above
 data_processed <- data_complete |> 
   mutate(exclude_participant = case_when(exclusion_incomplete_scale_a == "exclude" ~ "exclude",
                                          exclusion_incomplete_scale_c == "exclude" ~ "exclude",
@@ -467,7 +469,7 @@ write_csv(data_processed, "../data/processed/data_processed.csv")
 
 # Create Codebook Template for the Processed Data
 
-If it has not already been created, this code write the codebook template to disk. 
+If it has not already been created, this code write the codebook template to disk. Note that the variable explanations must be added manually.
 
 ```{r}
 

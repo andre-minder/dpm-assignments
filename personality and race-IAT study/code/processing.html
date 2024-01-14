@@ -1664,7 +1664,7 @@ border-radius: 0px;
 Big-5 Personality Facets and Implicit Racial Attitudes</h1>
 <h3 class="subtitle">Data processing</h3>
 <h4 class="author">André Minder</h4>
-<h4 class="date">13 Januar, 2024</h4>
+<h4 class="date">14 Januar, 2024</h4>
 
 </div>
 
@@ -1772,8 +1772,8 @@ negative values).</p>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;bfi_a&quot;</span>)) <span class="sc">|&gt;</span> </span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="fu">cor</span>(<span class="at">use =</span> <span class="st">&quot;pairwise.complete.obs&quot;</span>) <span class="sc">|&gt;</span> </span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">all</span>(. <span class="sc">&gt;</span> <span class="dv">0</span>))) <span class="sc">|&gt;</span> </span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="fu">all</span>()</span></code></pre></div>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">all</span>(. <span class="sc">&gt;</span> <span class="dv">0</span>))) <span class="sc">|&gt;</span> <span class="co"># summarize all positive values</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="fu">all</span>() <span class="co"># check if all values are positive</span></span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="conscientiousness" class="section level4">
@@ -1808,8 +1808,8 @@ negative values).</p>
 <span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;bfi_c&quot;</span>)) <span class="sc">|&gt;</span> </span>
 <span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="fu">cor</span>(<span class="at">use =</span> <span class="st">&quot;pairwise.complete.obs&quot;</span>) <span class="sc">|&gt;</span> </span>
 <span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">all</span>(. <span class="sc">&gt;</span> <span class="dv">0</span>))) <span class="sc">|&gt;</span> </span>
-<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="fu">all</span>()</span></code></pre></div>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">all</span>(. <span class="sc">&gt;</span> <span class="dv">0</span>))) <span class="sc">|&gt;</span> <span class="co"># summarize all positive values</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="fu">all</span>() <span class="co"># check if all values are positive</span></span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="extroversion" class="section level4">
@@ -1842,8 +1842,8 @@ negative values).</p>
 <span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;bfi_e&quot;</span>)) <span class="sc">|&gt;</span> </span>
 <span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>  <span class="fu">cor</span>(<span class="at">use =</span> <span class="st">&quot;pairwise.complete.obs&quot;</span>) <span class="sc">|&gt;</span> </span>
 <span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">all</span>(. <span class="sc">&gt;</span> <span class="dv">0</span>))) <span class="sc">|&gt;</span> </span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>  <span class="fu">all</span>()</span></code></pre></div>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">all</span>(. <span class="sc">&gt;</span> <span class="dv">0</span>))) <span class="sc">|&gt;</span> <span class="co"># summarize all positive values</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>  <span class="fu">all</span>() <span class="co"># check if all values are positive</span></span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="neuroticism" class="section level4">
@@ -1876,8 +1876,8 @@ negative values).</p>
 <span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;bfi_n&quot;</span>)) <span class="sc">|&gt;</span> </span>
 <span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>  <span class="fu">cor</span>(<span class="at">use =</span> <span class="st">&quot;pairwise.complete.obs&quot;</span>) <span class="sc">|&gt;</span></span>
 <span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">all</span>(. <span class="sc">&gt;</span> <span class="dv">0</span>))) <span class="sc">|&gt;</span> </span>
-<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a>  <span class="fu">all</span>()</span></code></pre></div>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">all</span>(. <span class="sc">&gt;</span> <span class="dv">0</span>))) <span class="sc">|&gt;</span>  <span class="co"># summarize all positive values</span></span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a>  <span class="fu">all</span>() <span class="co"># check if all values are positive</span></span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="openness" class="section level4">
@@ -1914,8 +1914,8 @@ negative values).</p>
 <span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;bfi_o&quot;</span>)) <span class="sc">|&gt;</span> </span>
 <span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>  <span class="fu">cor</span>(<span class="at">use =</span> <span class="st">&quot;pairwise.complete.obs&quot;</span>) <span class="sc">|&gt;</span></span>
 <span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a>  <span class="fu">as.data.frame</span>()<span class="sc">|&gt;</span> </span>
-<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">all</span>(. <span class="sc">&gt;</span> <span class="dv">0</span>))) <span class="sc">|&gt;</span> </span>
-<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a>  <span class="fu">all</span>()</span></code></pre></div>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">all</span>(. <span class="sc">&gt;</span> <span class="dv">0</span>))) <span class="sc">|&gt;</span> <span class="co"># summarize all positive values</span></span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a>  <span class="fu">all</span>() <span class="co"># check if all values are positive</span></span></code></pre></div>
 <pre><code>## [1] FALSE</code></pre>
 </div>
 </div>
@@ -2043,7 +2043,7 @@ variables and blocks)</p>
 <span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">trial_rt =</span> trial_reaction_time_in_ms) <span class="sc">|&gt;</span> </span>
 <span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a>  <span class="fu">select</span>(unique_id, block_number, trial_accuracy, trial_rt) <span class="sc">|&gt;</span></span>
 <span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">trial_rt =</span> <span class="fu">as.numeric</span>(trial_rt)) <span class="sc">|&gt;</span> </span>
-<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>block_number <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>))</span></code></pre></div>
+<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>block_number <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">5</span>)) <span class="co"># filter out non-critical blocks </span></span></code></pre></div>
 </div>
 <div id="d-score" class="section level2">
 <h2>D-score</h2>
@@ -2080,8 +2080,8 @@ sanity check is conducted in the end to confirm that this is the case
 <span id="cb29-25"><a href="#cb29-25" tabindex="-1"></a><span class="co"># Sanity check (scores are bounded between -2 and +2)</span></span>
 <span id="cb29-26"><a href="#cb29-26" tabindex="-1"></a>data_iat_scored <span class="sc">|&gt;</span> </span>
 <span id="cb29-27"><a href="#cb29-27" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bounded_correctly =</span> <span class="fu">between</span>(d_score, <span class="at">left =</span> <span class="sc">-</span><span class="dv">2</span>, <span class="at">right =</span> <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb29-28"><a href="#cb29-28" tabindex="-1"></a>  <span class="fu">filter</span>(bounded_correctly <span class="sc">!=</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb29-29"><a href="#cb29-29" tabindex="-1"></a>  <span class="fu">nrow</span>() <span class="sc">==</span> <span class="dv">0</span></span></code></pre></div>
+<span id="cb29-28"><a href="#cb29-28" tabindex="-1"></a>  <span class="fu">filter</span>(bounded_correctly <span class="sc">!=</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> <span class="co"># filter out the rows with values that surpass the bounds</span></span>
+<span id="cb29-29"><a href="#cb29-29" tabindex="-1"></a>  <span class="fu">nrow</span>() <span class="sc">==</span> <span class="dv">0</span> <span class="co"># number of rows should be zero (no bounds are crossed)</span></span></code></pre></div>
 <pre><code>## [1] TRUE</code></pre>
 </div>
 <div id="exclusions" class="section level2">
@@ -2097,7 +2097,7 @@ responses are under 300ms)</li>
 <li>Bad accuracy in the critical IAT blocks (accuracy is below 75%)</li>
 </ul>
 <p>At the end, all exclusion data frames are joined together.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="co"># exclude participants with incomplete/deviating trial data</span></span>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="co"># exclude participants with incomplete/deviating trial data (deviating from 120 trials)</span></span>
 <span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>data_iat_incomplete_trial_exclusion <span class="ot">&lt;-</span> data_iat_clean <span class="sc">|&gt;</span> </span>
 <span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a>  <span class="fu">group_by</span>(unique_id) <span class="sc">|&gt;</span> </span>
 <span id="cb31-4"><a href="#cb31-4" tabindex="-1"></a>  <span class="fu">count</span>() <span class="sc">|&gt;</span> </span>
@@ -2105,17 +2105,17 @@ responses are under 300ms)</li>
 <span id="cb31-6"><a href="#cb31-6" tabindex="-1"></a></span>
 <span id="cb31-7"><a href="#cb31-7" tabindex="-1"></a><span class="co"># exclude participants with too many fast answers, i.e. bad adherence/performance (more than 10% of the trials are answered faster than 300ms)</span></span>
 <span id="cb31-8"><a href="#cb31-8" tabindex="-1"></a>data_iat_fast_answers_exclusion <span class="ot">&lt;-</span> data_iat_clean <span class="sc">|&gt;</span> </span>
-<span id="cb31-9"><a href="#cb31-9" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">fast_answer =</span> <span class="fu">ifelse</span>(trial_rt <span class="sc">&lt;</span> <span class="dv">300</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb31-9"><a href="#cb31-9" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">fast_answer =</span> <span class="fu">ifelse</span>(trial_rt <span class="sc">&lt;</span> <span class="dv">300</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>)) <span class="sc">|&gt;</span> <span class="co"># mark fast responses (&lt; 300ms)</span></span>
 <span id="cb31-10"><a href="#cb31-10" tabindex="-1"></a>  <span class="fu">group_by</span>(unique_id) <span class="sc">|&gt;</span> </span>
 <span id="cb31-11"><a href="#cb31-11" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">proportion_fast_answer_IAT =</span> <span class="fu">mean</span>(fast_answer)) <span class="sc">|&gt;</span></span>
-<span id="cb31-12"><a href="#cb31-12" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">exclusion_IAT_performance =</span> <span class="fu">ifelse</span>(proportion_fast_answer_IAT <span class="sc">&gt;</span> <span class="fl">0.10</span>, <span class="st">&quot;exclude&quot;</span>, <span class="st">&quot;include&quot;</span>))</span>
+<span id="cb31-12"><a href="#cb31-12" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">exclusion_IAT_performance =</span> <span class="fu">ifelse</span>(proportion_fast_answer_IAT <span class="sc">&gt;</span> <span class="fl">0.10</span>, <span class="st">&quot;exclude&quot;</span>, <span class="st">&quot;include&quot;</span>)) <span class="co"># mark participants as excluded if they answer fast in more than 10% of the trials</span></span>
 <span id="cb31-13"><a href="#cb31-13" tabindex="-1"></a></span>
 <span id="cb31-14"><a href="#cb31-14" tabindex="-1"></a><span class="co"># exclude participants with bad accuracy (&lt; 75%)</span></span>
 <span id="cb31-15"><a href="#cb31-15" tabindex="-1"></a>data_iat_accuracy_exclusion <span class="ot">&lt;-</span> data_iat_clean <span class="sc">|&gt;</span> </span>
-<span id="cb31-16"><a href="#cb31-16" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">trial_accuracy =</span> <span class="fu">recode</span>(trial_accuracy, <span class="st">&quot;correct&quot;</span> <span class="ot">=</span> <span class="cn">TRUE</span>, <span class="st">&quot;incorrect&quot;</span> <span class="ot">=</span> <span class="cn">FALSE</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb31-16"><a href="#cb31-16" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">trial_accuracy =</span> <span class="fu">recode</span>(trial_accuracy, <span class="st">&quot;correct&quot;</span> <span class="ot">=</span> <span class="cn">TRUE</span>, <span class="st">&quot;incorrect&quot;</span> <span class="ot">=</span> <span class="cn">FALSE</span>)) <span class="sc">|&gt;</span> <span class="co"># recode the accuracy variable to get the proportion of accurate answers more easily</span></span>
 <span id="cb31-17"><a href="#cb31-17" tabindex="-1"></a>  <span class="fu">group_by</span>(unique_id) <span class="sc">|&gt;</span> </span>
 <span id="cb31-18"><a href="#cb31-18" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">proportion_accurate_answers_IAT =</span> <span class="fu">mean</span>(trial_accuracy)) <span class="sc">|&gt;</span></span>
-<span id="cb31-19"><a href="#cb31-19" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">exclusion_IAT_accuracy =</span> <span class="fu">ifelse</span>(proportion_accurate_answers_IAT <span class="sc">&lt;</span> <span class="fl">0.75</span>, <span class="st">&quot;exclude&quot;</span>, <span class="st">&quot;include&quot;</span>))</span>
+<span id="cb31-19"><a href="#cb31-19" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">exclusion_IAT_accuracy =</span> <span class="fu">ifelse</span>(proportion_accurate_answers_IAT <span class="sc">&lt;</span> <span class="fl">0.75</span>, <span class="st">&quot;exclude&quot;</span>, <span class="st">&quot;include&quot;</span>)) <span class="co"># mark participants as excluded if they have an accuracy below 75%</span></span>
 <span id="cb31-20"><a href="#cb31-20" tabindex="-1"></a></span>
 <span id="cb31-21"><a href="#cb31-21" tabindex="-1"></a><span class="co"># merge all IAT exclusion tables into one</span></span>
 <span id="cb31-22"><a href="#cb31-22" tabindex="-1"></a>data_iat_exclusions <span class="ot">&lt;-</span> <span class="fu">full_join</span>(data_iat_incomplete_trial_exclusion, data_iat_fast_answers_exclusion, <span class="at">by =</span> <span class="st">&quot;unique_id&quot;</span>) <span class="sc">|&gt;</span> </span>
@@ -2139,18 +2139,19 @@ responses are under 300ms)</li>
 <p>Apply master exclusions. Note that participants with no IAT data are
 also marked as excluded here (based on the rational that they do not
 have 120 IAT trials). This keeps them out of the analysis.</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a>data_processed <span class="ot">&lt;-</span> data_complete <span class="sc">|&gt;</span> </span>
-<span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">exclude_participant =</span> <span class="fu">case_when</span>(exclusion_incomplete_scale_a <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
-<span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a>                                         exclusion_incomplete_scale_c <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
-<span id="cb34-4"><a href="#cb34-4" tabindex="-1"></a>                                         exclusion_incomplete_scale_e <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
-<span id="cb34-5"><a href="#cb34-5" tabindex="-1"></a>                                         exclusion_incomplete_scale_n <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
-<span id="cb34-6"><a href="#cb34-6" tabindex="-1"></a>                                         exclusion_incomplete_scale_o <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
-<span id="cb34-7"><a href="#cb34-7" tabindex="-1"></a>                                         exclude_impossible_values <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
-<span id="cb34-8"><a href="#cb34-8" tabindex="-1"></a>                                         exclusion_incomplete_trials_IAT <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
-<span id="cb34-9"><a href="#cb34-9" tabindex="-1"></a>                                         <span class="fu">is.na</span>(exclusion_incomplete_trials_IAT) <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
-<span id="cb34-10"><a href="#cb34-10" tabindex="-1"></a>                                         exclusion_IAT_performance <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
-<span id="cb34-11"><a href="#cb34-11" tabindex="-1"></a>                                         exclusion_IAT_accuracy <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>, </span>
-<span id="cb34-12"><a href="#cb34-12" tabindex="-1"></a>                                         <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;include&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="co"># Mark participants as excluded if they have been excluded according to any of the exclusion criteria above</span></span>
+<span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a>data_processed <span class="ot">&lt;-</span> data_complete <span class="sc">|&gt;</span> </span>
+<span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">exclude_participant =</span> <span class="fu">case_when</span>(exclusion_incomplete_scale_a <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
+<span id="cb34-4"><a href="#cb34-4" tabindex="-1"></a>                                         exclusion_incomplete_scale_c <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
+<span id="cb34-5"><a href="#cb34-5" tabindex="-1"></a>                                         exclusion_incomplete_scale_e <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
+<span id="cb34-6"><a href="#cb34-6" tabindex="-1"></a>                                         exclusion_incomplete_scale_n <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
+<span id="cb34-7"><a href="#cb34-7" tabindex="-1"></a>                                         exclusion_incomplete_scale_o <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
+<span id="cb34-8"><a href="#cb34-8" tabindex="-1"></a>                                         exclude_impossible_values <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
+<span id="cb34-9"><a href="#cb34-9" tabindex="-1"></a>                                         exclusion_incomplete_trials_IAT <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
+<span id="cb34-10"><a href="#cb34-10" tabindex="-1"></a>                                         <span class="fu">is.na</span>(exclusion_incomplete_trials_IAT) <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
+<span id="cb34-11"><a href="#cb34-11" tabindex="-1"></a>                                         exclusion_IAT_performance <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>,</span>
+<span id="cb34-12"><a href="#cb34-12" tabindex="-1"></a>                                         exclusion_IAT_accuracy <span class="sc">==</span> <span class="st">&quot;exclude&quot;</span> <span class="sc">~</span> <span class="st">&quot;exclude&quot;</span>, </span>
+<span id="cb34-13"><a href="#cb34-13" tabindex="-1"></a>                                         <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;include&quot;</span>))</span></code></pre></div>
 </div>
 <div id="write-to-disk" class="section level1">
 <h1>Write to Disk</h1>
@@ -2163,7 +2164,8 @@ have 120 IAT trials). This keeps them out of the analysis.</p>
 <div id="create-codebook-template-for-the-processed-data" class="section level1">
 <h1>Create Codebook Template for the Processed Data</h1>
 <p>If it has not already been created, this code write the codebook
-template to disk.</p>
+template to disk. Note that the variable explanations must be added
+manually.</p>
 <div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">file.exists</span>(<span class="st">&quot;../data/processed/data_processed_codebook.xlsx&quot;</span>)){</span>
 <span id="cb36-2"><a href="#cb36-2" tabindex="-1"></a>  <span class="co"># convert the column names to a df</span></span>
 <span id="cb36-3"><a href="#cb36-3" tabindex="-1"></a>  codebook_template <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">variable =</span> <span class="fu">colnames</span>(data_processed)) <span class="sc">|&gt;</span></span>
